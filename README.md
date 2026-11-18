@@ -37,7 +37,7 @@ You need an Android phone (Android 8 or newer) and an OpenAI account with a paym
 
 ### 2. Install the app
 
-1. On the phone, open the [latest release](../../releases/latest) and download `Sabesednik.apk`.
+1. On the phone, open the [latest release](https://github.com/oktayshakirov/grandpa-voice/releases/latest) and download `Sabesednik.apk`.
 2. Open the downloaded file. Android asks to allow installing apps from your browser: allow it, then **Install**.
 3. Open **Събеседник** and allow the **microphone** and **notifications**.
 
