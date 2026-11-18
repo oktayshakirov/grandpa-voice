@@ -25,7 +25,7 @@ No credit yet? Everything except OpenAI itself can be tested with the mock serve
 ## 2. Bulgarian quality check (before investing more time)
 
 Open the OpenAI Realtime playground (platform.openai.com › Playground › Realtime), paste the instructions from
-`settings/Defaults.kt`, choose the same voice, and speak Bulgarian slowly with pauses, the way he speaks.
+`settings/Defaults.kt`, choose the same voice, and speak Bulgarian slowly with pauses, the way they speak.
 If you dislike the voice, try `cedar`, `marin`, `ash`, `sage` — then set the same one in the app.
 
 ## 3. Shake sensitivity
@@ -33,8 +33,8 @@ If you dislike the voice, try `cedar`, `marin`, `ash`, `sage` — then set the s
 Open hidden settings. Under **Разклащане** the live bar („Сега: … g“, „Разпознати: …“) updates as you move the phone; shakes here are only counted, they never start a conversation.
 
 - Pick the phone up, put it down, carry it across the room: the counter must **not** increase.
-- Have *him* shake it the way he naturally would: the counter **must** increase each time (beep + buzz).
-- Adjust: lower the threshold (e.g. 1.8 g) if his shakes are gentle; raise it or require more pushes if it
+- Have *them* shake it the way they naturally would: the counter **must** increase each time (beep + buzz).
+- Adjust: lower the threshold (e.g. 1.8 g) if their shakes are gentle; raise it or require more pushes if it
   triggers by accident. Save.
 
 ## 4. First conversation (screen on)

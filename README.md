@@ -15,7 +15,7 @@ greets them in Bulgarian, listens patiently and talks back like someone on the p
 </p>
 
 Everything on screen and everything it says is in Bulgarian. The voice is OpenAI's Realtime
-speech-to-speech model, so turns flow naturally and he can interrupt it. It also waits through
+speech-to-speech model, so turns flow naturally and they can interrupt it. It also waits through
 long pauses.
 
 ---
@@ -33,7 +33,7 @@ You need an Android phone (Android 8 or newer) and an OpenAI account with a paym
 
 > Tip: before going further, try the voice in the
 > [Realtime playground](https://platform.openai.com/playground/realtime). Speak Bulgarian slowly,
-> the way he would, and check you like how it sounds.
+> the way they would, and check you like how it sounds.
 
 ### 2. Install the app
 
@@ -45,13 +45,14 @@ You need an Android phone (Android 8 or newer) and an OpenAI account with a paym
 
 1. Tap the green **Настрой** button.
 2. Paste your key into **API ключ**.
-3. Type his name in **Име** (e.g. „Иване“ or „дядо Иван“). This is how it will address him.
+3. Choose **Жена** or **Мъж**. Bulgarian is gendered, so this makes it say „уморена ли си“ to a woman and
+   „уморен ли си“ to a man. Then type the name in **Име** (e.g. „Марийке“ or „бабо Мария“). This is how it will address them.
 4. Tap **Провери връзката**. You should see a green „✓ Връзката работи“.
 5. Tap **Запази**. Now shake the phone and say hello!
 
 The key is stored encrypted on this phone only.
 
-### 4. Make the phone "his" (recommended)
+### 4. Make the phone theirs (recommended)
 
 In the app's settings, under **Телефон**:
 
@@ -72,30 +73,40 @@ In Android's own settings:
 
 ---
 
-## How he uses it
+## How they use it
 
-| He does | It does |
+| They do | It does |
 |---|---|
-| Shakes the phone (a few firm shakes) | Beeps, buzzes, says hello and asks how he is |
+| Shakes the phone (a few firm shakes) | Beeps, buzzes, says hello and asks how they are |
 | Talks, pauses, thinks, carries on | Waits patiently, then answers in short, warm sentences |
 | Talks while it is speaking | Stops and listens |
 | Says „довиждане“, „чао“, „лека нощ“… | Says goodbye and hangs up |
 | Shakes again during a call | Hangs up straight away |
-| Stays silent for 2 minutes | Says it's here whenever he wants, and hangs up |
+| Stays silent for 2 minutes | Says it's here whenever they want, and hangs up |
 
-The circle's colour tells him what is happening: **green** = speak, I'm listening; **blue** = I'm
+The circle's colour shows what is happening: **green** = speak, I'm listening; **blue** = I'm
 talking; **orange** = one moment; **red** = something went wrong (also said out loud).
 Touching the circle also starts or ends a conversation.
 
 ## What it costs
 
 - **The app:** free.
-- **OpenAI:** you pay per minute of conversation (billed in audio tokens). Expect roughly a few
-  cents per minute; long conversations cost a bit more per minute. Check
-  [openai.com/api/pricing](https://openai.com/api/pricing). In settings you can pick the cheaper
-  `gpt-realtime-2.1-mini` model instead of the default `gpt-realtime-1.5`. **Set the monthly budget
-  limit** (step 1), and the most you can ever pay is that amount.
-- Each conversation stops by itself after 30 minutes (adjustable).
+- **OpenAI:** you pay for the minutes of conversation. Prices are per audio token
+  ([official pricing](https://developers.openai.com/api/docs/pricing)). Worked out for a
+  typical chat where each side talks half the time:
+
+  | Model (choose in settings) | Per minute | 15 min every day | 30 min every day |
+  |---|---|---|---|
+  | `gpt-realtime-1.5` (default, most natural) | ~5–8¢ | ~$25–35 / month | ~$50–70 / month |
+  | `gpt-realtime-2.1-mini` (cheaper) | ~2–3¢ | ~$9–14 / month | ~$18–27 / month |
+
+  These are estimates. Long conversations cost a bit more per minute, because the model re-reads
+  the conversation so far before each reply. Start with the default, look at the usage page after a week,
+  and switch to the mini model if needed.
+- **Set the monthly budget limit** (step 1), and the most you can ever pay is that amount.
+  A conversation also stops by itself after 2 minutes of silence or 30 minutes in total.
+- OpenAI's free daily tokens for data sharing cover text models only, not voice. The account also
+  needs a positive balance to work at all.
 
 ## Good to know
 
@@ -110,7 +121,7 @@ Touching the circle also starts or ends a conversation.
 - Nothing can detect a shake when the phone is switched off or the app was force-stopped.
 - The app shows a quiet notification all the time. Android requires it for anything that keeps
   running in the background.
-- How well it understands strong regional accents depends on OpenAI's model. Test it with him early.
+- How well it understands strong regional accents depends on OpenAI's model. Test it with them early.
 
 **Privacy**
 - Nothing is recorded or saved: no audio, no transcripts. Audio streams to OpenAI over encrypted WebRTC.
@@ -225,7 +236,6 @@ phones from different brands. Run [docs/TESTING.md](docs/TESTING.md) on the real
 ### Before publishing to Google Play
 
 - Use the token broker (or your own backend with accounts) instead of a key typed into the phone.
-- The prompt is written for a man (*него*, *го*). Add a gender setting before publishing more widely.
 - Google Play restricts `FOREGROUND_SERVICE_SPECIAL_USE`, the HOME launcher category and
   `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`. Expect to justify them in the Play Console declarations.
 - Add a privacy policy (microphone audio is sent to OpenAI).

@@ -13,7 +13,9 @@ data class Settings(
 
     // Conversation
     val userName: String = "",
-    val systemPrompt: String = Defaults.SYSTEM_PROMPT,
+    /** Bulgarian is gendered: the model must say "уморена" to a woman and "уморен" to a man. */
+    val userGender: String = GENDER_FEMALE,
+    val systemPrompt: String = Defaults.SYSTEM_PROMPT_FEMALE,
     val model: String = Defaults.MODEL,
     val voice: String = "marin",
     val speechSpeed: Float = 0.95f,
@@ -42,6 +44,9 @@ data class Settings(
         }
 
     companion object {
+        const val GENDER_FEMALE = "female"
+        const val GENDER_MALE = "male"
+
         const val MODE_OPENAI_KEY = "openai_key"
         const val MODE_SERVER = "server"
 

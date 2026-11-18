@@ -1,12 +1,12 @@
 # Setting up the phone (once, ≈15 minutes)
 
-Do these steps yourself before giving the phone to him. He should never need to see any of it.
+Do these steps yourself before giving them the phone. They should never need to see any of it.
 
 ## 1. Basic Android settings
 
 1. **Screen lock → None** (Settings › Security › Screen lock). With a PIN/pattern the app cannot start after a reboot
    until someone unlocks, and the lock screen gets in the way of a "just shake it" experience.
-2. **Language:** Bulgarian (optional, but makes system pop-ups understandable for him).
+2. **Language:** Bulgarian (optional, but makes system pop-ups understandable for them).
 3. **Volume:** turn media and call volume up. The app also sets call volume to maximum during conversations
    (switchable in settings).
 4. **Display › Screen timeout:** anything; the app keeps the screen on while charging.
@@ -21,7 +21,7 @@ Do these steps yourself before giving the phone to him. He should never need to 
 3. Tap **Настрой** (first start) or press and hold „Здравей!“ for 3 seconds → **Settings**:
    - under **Връзка с OpenAI**, paste your OpenAI API key (or choose **Собствен сървър** and enter the
      server address and device token if you run the token broker), then tap **Провери връзката**,
-   - optionally his name (e.g. „дядо Иван“ or just „Иване“ — this is how it will address him),
+   - choose **Жена** or **Мъж** (Bulgarian is gendered) and optionally a name (e.g. „бабо Мария“ or just „Марийке“). This is how it will address them,
    - tap **Изключи оптимизацията на батерията** and confirm,
    - tap **Направи го начален екран (Home)** and choose Събеседник as the Home app (choose "Always"),
    - **Запази**.
@@ -78,5 +78,5 @@ Kiosk mode is optional. The Home-app setup in step 2 already gives most of the b
 ## 6. Physical setup
 
 - A charging stand or a cable that stays plugged in. Screen-off shake detection uses battery.
-- Put the phone where he sits. On a table it works best with the screen facing up (speaker unobstructed).
-- If he uses hearing aids or a Bluetooth speaker/headset, pair it; the app routes audio there automatically.
+- Put the phone where they sit. On a table it works best with the screen facing up (speaker unobstructed).
+- If they use hearing aids or a Bluetooth speaker/headset, pair it; the app routes audio there automatically.

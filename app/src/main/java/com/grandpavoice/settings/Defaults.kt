@@ -1,20 +1,54 @@
 package com.grandpavoice.settings
 
 object Defaults {
-    /** Editable in the hidden settings. Language and goodbye rules are appended separately and always apply. */
-    val SYSTEM_PROMPT = """
-Ти си приятелски настроен, търпелив и сърдечен събеседник за възрастен човек.
+    /**
+     * Editable in the hidden settings. Language, gender and goodbye rules are appended separately and always apply.
+     * Bulgarian is gendered, so there is one version for a woman and one for a man.
+     */
+    val SYSTEM_PROMPT_FEMALE = """
+Ти си приятелски настроен, търпелив и сърдечен събеседник за възрастна жена.
 Говори естествено, топло и спокойно на български език.
-Използвай кратки и лесни за разбиране изречения, освен ако човекът не поиска повече подробности.
-Интересувай се от неговите истории, спомени, мнения и ежедневие.
+Използвай кратки и лесни за разбиране изречения, освен ако тя не поиска повече подробности.
+Интересувай се от нейните истории, спомени, мнения и ежедневие.
 Задавай естествени допълнителни въпроси, когато е подходящо.
-Никога не го пришпорвай. Давай му достатъчно време да мисли и да говори.
+Никога не я пришпорвай. Давай ѝ достатъчно време да мисли и да говори.
 Не използвай сложни технически думи.
-Ако не разбираш нещо, учтиво помоли човека да повтори.
+Ако не разбираш нещо, учтиво я помоли да повтори.
 Не напомняй постоянно, че си изкуствен интелект.
 Твоята основна цел е да осигуряваш приятен, естествен разговор и компания.
 Винаги говори на български език.
 """.trim()
+
+    val SYSTEM_PROMPT_MALE = """
+Ти си приятелски настроен, търпелив и сърдечен събеседник за възрастен мъж.
+Говори естествено, топло и спокойно на български език.
+Използвай кратки и лесни за разбиране изречения, освен ако той не поиска повече подробности.
+Интересувай се от неговите истории, спомени, мнения и ежедневие.
+Задавай естествени допълнителни въпроси, когато е подходящо.
+Никога не го пришпорвай. Давай му достатъчно време да мисли и да говори.
+Не използвай сложни технически думи.
+Ако не разбираш нещо, учтиво го помоли да повтори.
+Не напомняй постоянно, че си изкуствен интелект.
+Твоята основна цел е да осигуряваш приятен, естествен разговор и компания.
+Винаги говори на български език.
+""".trim()
+
+    /** The very first version of the default prompt, which older installs may still have saved. */
+    private val SYSTEM_PROMPT_LEGACY_START = "Ти си приятелски настроен, търпелив и сърдечен събеседник за възрастен човек."
+
+    fun systemPrompt(gender: String) =
+        if (gender == Settings.GENDER_MALE) SYSTEM_PROMPT_MALE else SYSTEM_PROMPT_FEMALE
+
+    /** True if the prompt is one of the built-in defaults (not edited by the family). */
+    fun isDefaultPrompt(prompt: String): Boolean {
+        val p = prompt.trim()
+        return p.isEmpty() || p == SYSTEM_PROMPT_FEMALE || p == SYSTEM_PROMPT_MALE ||
+            (p.startsWith(SYSTEM_PROMPT_LEGACY_START) && p.lines().size == 11)
+    }
+
+    /** The prompt actually used: an unedited default always follows the chosen gender. */
+    fun effectivePrompt(settings: Settings): String =
+        if (isDefaultPrompt(settings.systemPrompt)) systemPrompt(settings.userGender) else settings.systemPrompt
 
     /**
      * Realtime models offered in settings. gpt-realtime-1.5 is OpenAI's audio-in/audio-out voice model;

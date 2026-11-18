@@ -20,7 +20,7 @@ class SettingsRepository(context: Context) {
             backendUrl = input.backendUrl.trim(),
             deviceToken = input.deviceToken.trim(),
             userName = input.userName.trim(),
-            systemPrompt = input.systemPrompt.trim().ifBlank { Defaults.SYSTEM_PROMPT },
+            systemPrompt = input.systemPrompt.trim().ifBlank { Defaults.systemPrompt(input.userGender) },
         )
         val editor = prefs.edit()
         secrets.put(editor, K_OPENAI_KEY, s.openAiKey)
@@ -31,6 +31,7 @@ class SettingsRepository(context: Context) {
             .putString(K_MODEL, s.model)
             .putString(K_URL, s.backendUrl)
             .putString(K_NAME, s.userName)
+            .putString(K_GENDER, s.userGender)
             .putString(K_PROMPT, s.systemPrompt)
             .putString(K_VOICE, s.voice)
             .putFloat(K_SPEED, s.speechSpeed)
@@ -60,6 +61,7 @@ class SettingsRepository(context: Context) {
             deviceToken = (secrets.get(K_TOKEN) ?: prefs.getString(K_TOKEN, null))
                 ?.takeIf { it.isNotBlank() } ?: d.deviceToken,
             userName = prefs.getString(K_NAME, null) ?: d.userName,
+            userGender = prefs.getString(K_GENDER, null) ?: d.userGender,
             systemPrompt = prefs.getString(K_PROMPT, null) ?: d.systemPrompt,
             voice = prefs.getString(K_VOICE, null) ?: d.voice,
             speechSpeed = prefs.getFloat(K_SPEED, d.speechSpeed),
@@ -89,6 +91,7 @@ class SettingsRepository(context: Context) {
         const val K_URL = "backendUrl"
         const val K_TOKEN = "deviceToken"
         const val K_NAME = "userName"
+        const val K_GENDER = "userGender"
         const val K_PROMPT = "systemPrompt"
         const val K_VOICE = "voice"
         const val K_SPEED = "speechSpeed"

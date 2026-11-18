@@ -180,6 +180,15 @@ fun SettingsScreen(
             }
 
             Section("Човекът") {
+                Segmented(
+                    options = listOf(Settings.GENDER_FEMALE to "Жена", Settings.GENDER_MALE to "Мъж"),
+                    selected = s.userGender,
+                ) { gender ->
+                    // An unedited default prompt switches along with the gender.
+                    val prompt = if (Defaults.isDefaultPrompt(s.systemPrompt)) Defaults.systemPrompt(gender) else s.systemPrompt
+                    s = s.copy(userGender = gender, systemPrompt = prompt)
+                }
+                Note("Българският има род: асистентът ще казва „уморена ли си“ на жена и „уморен ли си“ на мъж.")
                 Field("Име, с което да се обръща (по желание)", s.userName) { s = s.copy(userName = it) }
             }
 
@@ -284,7 +293,7 @@ fun SettingsScreen(
 
             Section("Инструкции към асистента") {
                 OutlinedTextField(
-                    value = s.systemPrompt,
+                    value = Defaults.effectivePrompt(s),
                     onValueChange = { s = s.copy(systemPrompt = it) },
                     minLines = 6,
                     textStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp, color = Palette.Ink),
@@ -292,7 +301,7 @@ fun SettingsScreen(
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth(),
                 )
-                SecondaryButton("Върни инструкциите по подразбиране") { s = s.copy(systemPrompt = Defaults.SYSTEM_PROMPT) }
+                SecondaryButton("Върни инструкциите по подразбиране") { s = s.copy(systemPrompt = Defaults.systemPrompt(s.userGender)) }
                 Note("Правилата за български език и за край на разговора се добавят автоматично и винаги важат.")
             }
 

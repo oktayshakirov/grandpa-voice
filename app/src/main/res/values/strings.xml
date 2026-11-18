@@ -5,7 +5,7 @@
     <!-- Main screen -->
     <string name="greeting">Здравей!</string>
     <string name="greeting_named">Здравей, %1$s!</string>
-    <string name="state_standby">Тук съм и съм готов.</string>
+    <string name="state_standby">Тук съм за теб.</string>
     <string name="hint_standby">Разклати телефона, за да си поговорим.</string>
     <string name="state_connecting">Свързвам се…</string>
     <string name="hint_connecting">Само момент.</string>
