@@ -1,0 +1,2 @@
+aiortc>=1.9
+aiohttp>=3.9

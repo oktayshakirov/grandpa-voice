@@ -1,0 +1,17 @@
+.gradle/
+.idea/
+build/
+local.properties
+*.iml
+.DS_Store
+captures/
+.cxx/
+backend/node_modules/
+backend/.env
+keystore.properties
+*.jks
+*.keystore
+tools/mock-realtime/.venv/
+tools/mock-realtime/__pycache__/
+tools/mock-realtime/audio/
+/dist/

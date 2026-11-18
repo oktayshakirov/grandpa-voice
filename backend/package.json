@@ -1,0 +1,9 @@
+{
+  "name": "grandpa-voice-broker",
+  "version": "1.0.0",
+  "description": "Issues short-lived OpenAI Realtime keys to the Grandpa Voice Android app.",
+  "type": "module",
+  "main": "server.js",
+  "engines": { "node": ">=20" },
+  "scripts": { "start": "node server.js" }
+}

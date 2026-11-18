@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Събеседник</string>
+
+    <!-- Main screen -->
+    <string name="greeting">Здравей!</string>
+    <string name="greeting_named">Здравей, %1$s!</string>
+    <string name="state_standby">Тук съм и съм готов.</string>
+    <string name="hint_standby">Разклати телефона, за да си поговорим.</string>
+    <string name="state_connecting">Свързвам се…</string>
+    <string name="hint_connecting">Само момент.</string>
+    <string name="state_listening">Слушам те…</string>
+    <string name="hint_listening">Говори спокойно, не бързай.</string>
+    <string name="state_thinking">Само момент…</string>
+    <string name="state_speaking">Говоря…</string>
+    <string name="state_goodbye">Довиждане!</string>
+    <string name="hint_goodbye">Разклати телефона, когато пак искаш да си поговорим.</string>
+    <string name="hint_try_again">Разклати телефона, за да опитаме пак.</string>
+    <string name="cd_mic">Голям бутон с микрофон. Докосни, за да започнеш или приключиш разговор.</string>
+    <string name="grant_microphone">Разреши микрофона</string>
+    <string name="setup_needed_title">Още не съм настроен.</string>
+    <string name="setup_needed_hint">Нужен е ключ от OpenAI. Помолете близък да ме настрои.</string>
+    <string name="setup_button">Настрой</string>
+    <string name="tap_to_talk">или докосни кръга</string>
+
+    <!-- Errors: shown on screen and spoken aloud with the phone's own voice -->
+    <string name="error_no_internet">Няма връзка с интернет.</string>
+    <string name="error_connection_lost">Връзката прекъсна.</string>
+    <string name="error_microphone">Нямам достъп до микрофона.</string>
+    <string name="error_microphone_busy">Микрофонът е зает в момента.</string>
+    <string name="error_not_configured">Приложението още не е настроено.</string>
+    <string name="error_unauthorized">Приложението не е настроено правилно.</string>
+    <string name="error_no_credit">Сметката в OpenAI няма средства.</string>
+    <string name="error_rate_limited">Днес говорихме много. Нека опитаме малко по-късно.</string>
+    <string name="error_service">Услугата не отговаря в момента.</string>
+    <string name="error_open_app">Погледни телефона, за да започнем.</string>
+
+    <!-- Notification -->
+    <string name="notif_channel">Готовност</string>
+    <string name="notif_title">Събеседникът е готов</string>
+    <string name="notif_text">Разклати телефона, за да си поговорим.</string>
+</resources>
