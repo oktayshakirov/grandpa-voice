@@ -98,12 +98,17 @@ class KeyProvider(private val http: OkHttpClient) {
 
         /** Maps an HTTP error from OpenAI or the broker to something we can say to the user. */
         fun errorFor(r: Response, body: String): KeyException {
-            val error = runCatching { JSONObject(body) }.getOrNull()
-            val code = error?.optJSONObject("error")?.optString("code")
-                ?: error?.optString("error").orEmpty()
-            val message = "HTTP ${r.code} $code ${error?.optJSONObject("error")?.optString("message").orEmpty()}".trim()
+            val json = runCatching { JSONObject(body) }.getOrNull()
+            val error = json?.optJSONObject("error")
+            // OpenAI: {"error":{"type":"insufficient_quota","code":"credit_balance_exhausted"|"insufficient_quota"}}
+            // Our broker: {"error":"no_credit"}
+            val code = error?.optString("code") ?: json?.optString("error").orEmpty()
+            val type = error?.optString("type").orEmpty()
+            val message = "HTTP ${r.code} $code ${error?.optString("message").orEmpty()}".trim()
+            val noCredit = r.code == 402 || type == "insufficient_quota" ||
+                code in setOf("insufficient_quota", "credit_balance_exhausted", "no_credit")
             val reason = when {
-                code == "insufficient_quota" || code == "no_credit" || r.code == 402 -> KeyException.Reason.NO_CREDIT
+                noCredit -> KeyException.Reason.NO_CREDIT
                 r.code == 401 || r.code == 403 -> KeyException.Reason.UNAUTHORIZED
                 r.code == 429 -> KeyException.Reason.RATE_LIMITED
                 else -> KeyException.Reason.SERVER

@@ -27,8 +27,8 @@ android {
         applicationId = "com.grandpavoice"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 3
+        versionName = "1.1.1"
 
         // Real phones are ARM; dropping x86 halves the APK (WebRTC ships a native library per ABI).
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }

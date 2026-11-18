@@ -209,9 +209,17 @@ What was verified this way (Android 16 emulator):
 - a second shake ends a call
 - a shake with the screen off wakes the phone and starts a call
 - microphone audio streams the whole call and is released afterwards
-- "no credit" and "wrong key" errors are shown and spoken in Bulgarian (the wrong-key check ran against the real OpenAI API)
+- "no credit" and "wrong key" errors are shown and spoken in Bulgarian
 
-**Not yet verified:** a real conversation with OpenAI (needs credit) and behaviour on physical
+Against the **real OpenAI API** (an account without credit):
+
+- OpenAI accepts the app's session config (model, Bulgarian instructions, patient turn detection,
+  voice, `end_conversation` tool) for both `gpt-realtime-1.5` and `gpt-realtime-2.1-mini`
+- the full chain works up to the call: app → token broker → OpenAI key → WebRTC offer to OpenAI.
+  OpenAI then refuses the call for lack of credit, and the app says so in Bulgarian
+- a wrong key is reported as such
+
+**Not yet verified:** hearing the actual Bulgarian replies (needs credit) and behaviour on physical
 phones from different brands. Run [docs/TESTING.md](docs/TESTING.md) on the real phone.
 
 ### Before publishing to Google Play

@@ -175,6 +175,8 @@ async function createSession(body) {
   if (!r.ok) {
     const err = new Error(`OpenAI ${r.status}: ${data?.error?.code || ""} ${data?.error?.message || ""}`.trim());
     err.upstreamStatus = r.status;
+    err.noCredit = data?.error?.type === "insufficient_quota" ||
+      ["insufficient_quota", "credit_balance_exhausted"].includes(data?.error?.code);
     throw err;
   }
   const value = data.value || data.client_secret?.value;
@@ -211,7 +213,7 @@ const server = http.createServer(async (req, res) => {
       } catch (e) {
         log(`upstream error: ${e.message}`);
         // Pass "no credit" through so the phone can say so; everything else is a generic upstream failure.
-        if (/insufficient_quota/.test(e.message)) return send(res, 402, { error: "no_credit" });
+        if (e.noCredit) return send(res, 402, { error: "no_credit" });
         const status = e.upstreamStatus === 429 ? 429 : 502;
         return send(res, status, { error: "upstream" });
       }
