@@ -10,7 +10,8 @@ Lead with **Shake to talk to AI**. Show quick questions, thinking out loud, conv
 - [x] Put the language picker in onboarding and Settings.
 - [x] Use the selected language for the interface, conversation, and local spoken errors.
 - [x] Add bug report and feature suggestion actions.
-- [ ] Test a fresh install and an upgrade from the signed v1.2.0 APK. Verify language switching, conversations, and screen-off activation on a physical phone.
+- [x] Build the debug APK and run all 23 Gradle unit tests. Verify English is selected on a fresh install and that a previous emulator installation keeps its settings and can switch to English.
+- [ ] Test an upgrade from the signed v1.2.0 APK, a live conversation, and screen-off activation on a physical phone.
 
 ## Name and icon
 
@@ -22,7 +23,7 @@ Lead with **Shake to talk to AI**. Show quick questions, thinking out loud, conv
 
 - [x] Rewrite the README in English for a general audience, with setup, voice billing, privacy, and source-build information.
 - [ ] Publish the multilingual changes and a signed APK to GitHub Releases after testing. Use the original signing key.
-- [ ] Capture three actual Android screenshots in English after the branding is final. Show standby with “Shake to talk to AI,” the listening state with “Ask a question or think out loud,” and language selection with “Choose your conversation language.” Use test data and hide credentials. Use store copy to explain how the large controls help older adults and anyone who prefers speaking to typing.
+- [x] Capture two English Android screenshots for the store draft. See [standby](google-play/01-standby.png) and [first-launch language selection](google-play/02-language-selection.png).
 - [ ] If we proceed with Google Play, prepare the Android App Bundle, Play App Signing, support contact, store listing, Data safety form, privacy policy, and foreground-service declarations. Run a closed test to check whether people can complete setup on their own.
 
 ### Google Play draft

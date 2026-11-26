@@ -39,7 +39,7 @@ fun LanguageOnboarding(
             .background(Palette.Background)
             .safeDrawingPadding()
             .verticalScroll(rememberScrollState())
-            .padding(24.dp),
+            .padding(start = 24.dp, top = 40.dp, end = 24.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(stringResource(R.string.language_title), fontSize = 30.sp, fontWeight = FontWeight.Bold)
