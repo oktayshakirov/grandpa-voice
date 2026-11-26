@@ -6,12 +6,12 @@ Lead with **Shake to talk to AI**. Show quick questions, thinking out loud, conv
 
 ## Language and setup
 
-- [x] Default new installations to English and preserve the language on existing installations.
+- [x] Default to English on fresh installs and upgrades without a saved language. Preserve explicitly saved language preferences.
 - [x] Put the language picker in onboarding and Settings.
 - [x] Use the selected language for the interface, conversation, and local spoken errors.
 - [x] Add bug report and feature suggestion actions.
-- [x] Build the debug APK and run all 23 Gradle unit tests. Verify English is selected on a fresh install and that a previous emulator installation keeps its settings and can switch to English.
-- [ ] Test an upgrade from the signed v1.2.0 APK, a live conversation, and screen-off activation on a physical phone.
+- [x] Build the debug APK and run all 26 Gradle unit tests. Verify English is selected on a fresh install and that a previous emulator installation kept its settings.
+- [ ] Verify the 2.0.1 upgrade on a physical phone, including a live conversation and screen-off activation.
 
 ## Name and icon
 

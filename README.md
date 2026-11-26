@@ -6,13 +6,13 @@ Shake your phone or tap the microphone to start a real-time voice conversation. 
 
 The app is designed around one action. A large microphone button, clear listening and speaking indicators, and patient turn-taking make it easy to use at a desk, on a phone stand, or when setting up a simpler way to chat for someone who prefers speaking to typing.
 
-English is preselected on first launch. Choose a language during setup or change it later under **Settings → Language**. Your choice applies to both the interface and the conversation.
+English is preselected on first launch and is the default when upgrading from a version without a saved language preference. Choose a language during setup or change it later under **Settings → Language**. Your choice applies to both the interface and the conversation.
 
 ## Install and set up
 
 You'll need an Android 8 or newer phone with a microphone and accelerometer and either a funded OpenAI API account or a compatible [self-hosted server](backend/README.md).
 
-1. Download the APK from [GitHub Releases](https://github.com/oktayshakirov/grandpa-voice/releases). To try the features described here before the next APK release, build from source below.
+1. Download the APK from [GitHub Releases](https://github.com/oktayshakirov/grandpa-voice/releases). You can also build the app from source below.
 2. Open the app, choose a language if prompted, and allow microphone access.
 3. In **Settings → OpenAI connection**, enter an [OpenAI API key](https://platform.openai.com/api-keys) or your server address and device token. Select **Check connection** and then **Save**.
 4. Shake the phone or tap the microphone. Hold the greeting for three seconds to reopen Settings.

@@ -16,7 +16,7 @@ In Settings, tap **Check connection**. The result should say the connection work
 
 - On a fresh installation, confirm English is preselected. Choose Spanish or German and confirm the setup screens, conversation, and spoken errors match the selection.
 - Change the language in Settings, save, and reopen the app. Verify the choice persists and the next greeting and goodbye use the selected language.
-- Update a device from the signed original APK. Verify it opens directly in Bulgarian and retains the account and settings. Switch to English and verify the existing setup still connects.
+- Update a device from the signed original APK. Verify it opens in English and retains the account and settings. Choose a different language and verify subsequent upgrades preserve that explicit preference.
 - Check French and Portuguese with the same flow. For spoken errors, install the matching Android text-to-speech voice.
 
 ## 3. Shake sensitivity

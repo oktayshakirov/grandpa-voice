@@ -55,10 +55,9 @@ class SettingsRepository(context: Context) {
 
     private fun load(): Settings {
         val d = Settings()
-        val legacy = prefs.contains(K_MODE) && !prefs.contains(K_LANGUAGE)
         return Settings(
-            language = if (legacy) AppLanguage.BULGARIAN else AppLanguage.fromTag(prefs.getString(K_LANGUAGE, null)),
-            languageChosen = legacy || prefs.getBoolean(K_LANGUAGE_CHOSEN, false),
+            language = AppLanguage.fromTag(prefs.getString(K_LANGUAGE, null)),
+            languageChosen = prefs.getBoolean(K_LANGUAGE_CHOSEN, prefs.contains(K_MODE)),
             connectionMode = prefs.getString(K_MODE, null) ?: defaultMode(d),
             openAiKey = secrets.get(K_OPENAI_KEY).orEmpty(),
             model = prefs.getString(K_MODEL, null) ?: d.model,
