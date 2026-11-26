@@ -16,7 +16,7 @@ Lead with **Shake to talk to AI**. Show quick questions, thinking out loud, conv
 
 - [x] Use **Shake to AI** for the launcher label, project introduction, and store listing. Keep the Android application ID for install compatibility.
 - [ ] Confirm the name in Play Console and finish the brand availability check before publication.
-- [ ] Choose one of the four icon concepts, then prepare adaptive launcher layers, a themed monochrome variant, and the Google Play icon.
+- [x] Use the neon wave on dark purple for the adaptive launcher icon, with a monochrome wave for Android themes. Export the [512 px Google Play icon](google-play/shake-to-ai-icon.png).
 
 ## GitHub and store assets
 
