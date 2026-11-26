@@ -1,19 +1,17 @@
 package com.grandpavoice.conversation
 
+import com.grandpavoice.settings.AppLanguage
 import com.grandpavoice.settings.Defaults
 import com.grandpavoice.settings.Settings
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.util.Locale
 
-/**
- * Builds everything the model is told. All model-facing text is Bulgarian on purpose.
- * Bulgarian is gendered ("уморен/уморена ли си"), so every rule is written for the
- * gender chosen in settings.
- */
+/** Builds the conversation instructions, including the grammatical forms used in Bulgarian. */
 object Instructions {
 
-    private val BULGARIAN = Locale("bg", "BG")
+    private val BULGARIAN = Locale.forLanguageTag("bg-BG")
 
     /** Bulgarian words that change with the person's gender. */
     private class G(female: Boolean) {
@@ -28,6 +26,7 @@ object Instructions {
     private fun g(settings: Settings) = G(settings.userGender == Settings.GENDER_FEMALE)
 
     fun build(settings: Settings, now: ZonedDateTime = ZonedDateTime.now()): String {
+        if (settings.language != AppLanguage.BULGARIAN) return generalInstructions(settings, now)
         val date = DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy 'г.', HH:mm 'ч.'", BULGARIAN).format(now)
         val name = settings.userName.trim()
         val g = g(settings)
@@ -47,8 +46,29 @@ object Instructions {
         }
     }
 
+    private fun generalInstructions(settings: Settings, now: ZonedDateTime) = buildString {
+        val language = settings.language
+        val date = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG)
+            .withLocale(language.locale).format(now)
+        appendLine(Defaults.effectivePrompt(settings))
+        appendLine()
+        appendLine("Always speak in ${language.spokenName}, even when the person speaks another language.")
+        val name = settings.userName.trim()
+        if (name.isNotEmpty()) appendLine("Their preferred name is $name. Use it occasionally.")
+        appendLine("The current date and time are $date. Use this only when relevant.")
+        appendLine("All responses are spoken aloud. Avoid lists, symbols and abbreviations.")
+        appendLine("Allow time for pauses and repetitions. Follow topic changes and do not correct accents or dialects.")
+        appendLine("For health concerns suggest speaking with a trusted person or a clinician. In an emergency, suggest calling local emergency services.")
+        appendLine("When the person clearly wants to end the conversation, say a short, warm goodbye and then call end_conversation.")
+        appendLine("If they want to talk again, they can shake the phone or tap the microphone.")
+    }
+
     fun greeting(settings: Settings): String {
         val name = settings.userName.trim()
+        if (settings.language != AppLanguage.BULGARIAN) {
+            val who = if (name.isEmpty()) "the person" else "the person by their preferred name, $name"
+            return "Greet $who warmly in ${settings.language.spokenName} and ask how they are. Use one or two short sentences."
+        }
         val g = g(settings)
         val who = if (name.isNotEmpty()) "Поздрави $name по име" else "Поздрави ${g.shortHim}"
         return "Разговорът тъкмо започва, защото ${g.he} разклати телефона, за да си поговорите. " +
@@ -56,15 +76,24 @@ object Instructions {
             "Само едно или две кратки изречения на български."
     }
 
-    const val FAREWELL_USER =
+    fun farewellUser(language: AppLanguage) = if (language == AppLanguage.BULGARIAN) FAREWELL_USER
+        else "The person wants to finish. Say a short, warm goodbye in ${language.spokenName}."
+
+    fun farewellInactivity(language: AppLanguage) = if (language == AppLanguage.BULGARIAN) FAREWELL_INACTIVITY
+        else "The person has been quiet for a while. In ${language.spokenName}, briefly say they can shake the phone to talk again, then say goodbye."
+
+    fun farewellTimeLimit(language: AppLanguage) = if (language == AppLanguage.BULGARIAN) FAREWELL_TIME_LIMIT
+        else "In ${language.spokenName}, gently suggest taking a break, explain they can shake the phone to talk again, and say goodbye."
+
+    private const val FAREWELL_USER =
         "Човекът иска да приключи разговора. Кажи едно кратко и топло изречение за довиждане на български."
 
-    const val FAREWELL_INACTIVITY =
+    private const val FAREWELL_INACTIVITY =
         "Човекът не е казал нищо от известно време. Кажи кратко и топло на български, " +
             "че си тук винаги, когато поиска пак да си поговорите, като просто разклати телефона, и се сбогувай. " +
             "Най-много две кратки изречения."
 
-    const val FAREWELL_TIME_LIMIT =
+    private const val FAREWELL_TIME_LIMIT =
         "Разговорът продължи доста дълго. Кажи мило на български, че е време за малка почивка " +
             "и че може да разклати телефона пак, когато пожелае. Сбогувай се кратко."
 

@@ -1,6 +1,7 @@
 package com.grandpavoice.service
 
 import android.Manifest
+import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,6 +18,7 @@ import com.grandpavoice.R
 import com.grandpavoice.conversation.ConversationManager
 import com.grandpavoice.conversation.Sounds
 import com.grandpavoice.settings.SettingsRepository
+import com.grandpavoice.settings.forLanguage
 import com.grandpavoice.shake.ShakeDetector
 import com.grandpavoice.shake.ShakeLogic
 import com.grandpavoice.state.CompanionState
@@ -136,7 +138,8 @@ class CompanionService : Service() {
                 if (CompanionState.pendingStart) {
                     CompanionState.pendingStart = false
                     CompanionState.set(UiState.Error(R.string.error_open_app))
-                    sounds.speak(getString(R.string.error_open_app))
+                    val language = settingsRepo.current.language
+                    sounds.speak(forLanguage(language).getString(R.string.error_open_app), language)
                     delay(8_000)
                     if (!conversation.isActive) CompanionState.set(UiState.Standby)
                 }
@@ -150,7 +153,12 @@ class CompanionService : Service() {
 
     /** @return false if the service could not become a foreground service at all. */
     private fun goForeground(fromUi: Boolean): Boolean {
-        val notification = Notifications.standby(this)
+        val localized = forLanguage(settingsRepo.current.language)
+        Notifications.createChannel(localized)
+        val notification = Notifications.standby(localized)
+        if (foregroundMode != FG_NONE) {
+            getSystemService(NotificationManager::class.java).notify(Notifications.FOREGROUND_ID, notification)
+        }
         val hasMic = checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {

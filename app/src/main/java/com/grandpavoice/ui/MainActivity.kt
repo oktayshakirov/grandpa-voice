@@ -17,7 +17,13 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +36,9 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grandpavoice.BuildConfig
 import com.grandpavoice.GrandpaVoiceApp
+import com.grandpavoice.R
+import com.grandpavoice.settings.AppLanguage
+import com.grandpavoice.settings.forLanguage
 import com.grandpavoice.conversation.Instructions
 import com.grandpavoice.conversation.KeyException
 import com.grandpavoice.conversation.KeyProvider
@@ -74,43 +83,78 @@ class MainActivity : ComponentActivity() {
             val state by CompanionState.state.collectAsStateWithLifecycle()
             val settings by app.settings.flow.collectAsStateWithLifecycle()
             var showSettings by rememberSaveable { mutableStateOf(false) }
+            var draftLanguage by rememberSaveable { mutableStateOf(settings.language.tag) }
+            val onboarding = !settings.languageChosen
+            val language = if (onboarding) AppLanguage.fromTag(draftLanguage) else settings.language
+            val configuration = LocalConfiguration.current
+            val localized = remember(language, configuration) { forLanguage(language) }
+            val layoutDirection = if (localized.resources.configuration.layoutDirection == android.view.View.LAYOUT_DIRECTION_RTL) {
+                LayoutDirection.Rtl
+            } else {
+                LayoutDirection.Ltr
+            }
 
             // Never leave the app with the Back button; Back only closes settings.
             BackHandler(enabled = true) { if (showSettings) showSettings = false }
 
+            LaunchedEffect(onboarding) {
+                if (!onboarding && !micGranted && !askedForPermissions) {
+                    askedForPermissions = true
+                    permissionLauncher.launch(requiredPermissions())
+                }
+            }
+
             LaunchedEffect(settings.keepScreenOn, charging, state) {
                 applyKeepScreenOn(settings.keepScreenOn, charging, active = state != UiState.Standby)
             }
-            LaunchedEffect(state, touchCount, resumeCount, settings.dimWhenIdle, showSettings) {
+            LaunchedEffect(state, touchCount, resumeCount, settings.dimWhenIdle, showSettings, onboarding) {
                 setDimmed(false)
-                if (state == UiState.Standby && settings.dimWhenIdle && !showSettings) {
+                if (state == UiState.Standby && settings.dimWhenIdle && !showSettings && !onboarding) {
                     delay(DIM_AFTER_MS)
                     setDimmed(true)
                 }
             }
 
-            GrandpaTheme {
-                if (showSettings) {
-                    SettingsScreen(
-                        initial = settings,
-                        actions = settingsActions,
-                        onSave = {
-                            app.settings.save(it)
-                            showSettings = false
-                        },
-                        onClose = { showSettings = false },
-                    )
-                } else {
-                    MainScreen(
-                        state = state,
-                        userName = settings.userName,
-                        configured = settings.isConfigured,
-                        micGranted = micGranted,
-                        onMicTap = { startCompanionService(CompanionService.ACTION_TOGGLE) },
-                        onOpenSettings = { showSettings = true },
-                        onGrantMic = ::onGrantMicClicked,
-                        onAnyTouch = { touchCount++ },
-                    )
+            CompositionLocalProvider(
+                LocalContext provides localized,
+                LocalConfiguration provides localized.resources.configuration,
+                LocalLayoutDirection provides layoutDirection,
+            ) {
+                GrandpaTheme {
+                    if (onboarding) {
+                        LanguageOnboarding(
+                            selected = language,
+                            onSelect = { draftLanguage = it.tag },
+                            onContinue = {
+                                app.settings.save(settings.copy(language = language, languageChosen = true))
+                                if (micGranted) startCompanionService(null)
+                                showSettings = !settings.isConfigured
+                            },
+                        )
+                    } else if (showSettings) {
+                        SettingsScreen(
+                            initial = settings,
+                            actions = settingsActions,
+                            onSave = {
+                                app.settings.save(it)
+                                if (micGranted) startCompanionService(null)
+                                showSettings = false
+                            },
+                            onClose = { showSettings = false },
+                        )
+                    } else {
+                        MainScreen(
+                            state = state,
+                            userName = settings.userName,
+                            language = language,
+                            configured = settings.isConfigured,
+                            micGranted = micGranted,
+                            onMicTap = { startCompanionService(CompanionService.ACTION_TOGGLE) },
+                            onOpenSettings = { showSettings = true },
+                            onGrantMic = ::onGrantMicClicked,
+                            onAnyTouch = { touchCount++ },
+                        )
+                    }
                 }
             }
         }
@@ -128,13 +172,10 @@ class MainActivity : ComponentActivity() {
         )?.let(::updateCharging)
 
         micGranted = hasMicPermission()
-        if (micGranted) {
+        if (micGranted && app.settings.current.languageChosen) {
             // Started while visible => the service may use the microphone later, even with the screen off.
             startCompanionService(null)
             if (CompanionState.pendingStart) startCompanionService(CompanionService.ACTION_START_PENDING)
-        } else if (!askedForPermissions) {
-            askedForPermissions = true
-            permissionLauncher.launch(requiredPermissions())
         }
 
         if (!CompanionState.kioskSuspended) Kiosk.enterIfAllowed(this)
@@ -272,26 +313,40 @@ class MainActivity : ComponentActivity() {
 
         override fun openAppSettings() = this@MainActivity.openAppSettings()
 
+        override fun openFeedback(feature: Boolean): Boolean {
+            val title = if (feature) "Feature request: " else "Bug report: "
+            val body = if (feature) "" else "App version: $appVersion\nAndroid: ${Build.VERSION.RELEASE}\n\n"
+            val url = Uri.parse("https://github.com/oktayshakirov/grandpa-voice/issues/new")
+                .buildUpon()
+                .appendQueryParameter("title", title)
+                .appendQueryParameter("body", body)
+                .build()
+            return runCatching { startActivity(Intent(Intent.ACTION_VIEW, url)) }.isSuccess
+        }
+
         override val appVersion: String = BuildConfig.VERSION_NAME
 
         override suspend fun testConnection(settings: Settings): TestResult = withContext(Dispatchers.IO) {
+            val localized = forLanguage(settings.language)
             try {
                 val ticket = KeyProvider(OkHttpClient()).fetch(
                     settings.copy(openAiKey = settings.openAiKey.trim(), model = settings.model.trim()),
                     Instructions.build(settings),
                 )
-                TestResult(true, "Връзката работи. Модел: ${settings.model}" +
-                    if (ticket.callsUrl != KeyProvider.OPENAI_CALLS_URL) " (тестов сървър)" else "")
+                val server = if (ticket.callsUrl != KeyProvider.OPENAI_CALLS_URL) {
+                    " (${localized.getString(R.string.test_server)})"
+                } else ""
+                TestResult(true, localized.getString(R.string.test_success, settings.model) + server)
             } catch (e: KeyException) {
-                val text = when (e.reason) {
-                    KeyException.Reason.NOT_CONFIGURED -> "Липсва ключ или адрес."
-                    KeyException.Reason.UNAUTHORIZED -> "Ключът е грешен или е изтрит."
-                    KeyException.Reason.NO_CREDIT -> "Сметката в OpenAI няма средства. Добавете кредит в Billing."
-                    KeyException.Reason.RATE_LIMITED -> "Твърде много заявки. Опитайте след малко."
-                    KeyException.Reason.NETWORK -> "Няма връзка с интернет или сървъра."
-                    KeyException.Reason.SERVER -> "Грешка от услугата"
+                val message = when (e.reason) {
+                    KeyException.Reason.NOT_CONFIGURED -> R.string.test_missing
+                    KeyException.Reason.UNAUTHORIZED -> R.string.test_unauthorized
+                    KeyException.Reason.NO_CREDIT -> R.string.test_no_credit
+                    KeyException.Reason.RATE_LIMITED -> R.string.test_rate_limited
+                    KeyException.Reason.NETWORK -> R.string.test_network
+                    KeyException.Reason.SERVER -> R.string.test_error
                 }
-                TestResult(false, "$text (${e.message})")
+                TestResult(false, localized.getString(message))
             }
         }
 

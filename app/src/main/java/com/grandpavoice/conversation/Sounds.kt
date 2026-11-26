@@ -8,11 +8,11 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.speech.tts.TextToSpeech
-import java.util.Locale
+import com.grandpavoice.settings.AppLanguage
 
 /**
  * Local feedback that works even without internet:
- * a short beep + buzz when a shake is recognised, and Bulgarian text-to-speech
+ * a short beep + buzz when a shake is recognised, and localized text-to-speech
  * (the phone's own engine) to say error messages aloud.
  */
 class Sounds(context: Context) : TextToSpeech.OnInitListener {
@@ -30,13 +30,9 @@ class Sounds(context: Context) : TextToSpeech.OnInitListener {
 
     override fun onInit(status: Int) {
         if (status != TextToSpeech.SUCCESS) return
-        val result = tts.setLanguage(Locale("bg", "BG"))
-        ttsReady = result >= TextToSpeech.LANG_AVAILABLE
         tts.setSpeechRate(0.9f)
+        ttsReady = true
     }
-
-    /** True if a Bulgarian voice is installed for the phone's own text-to-speech. */
-    val hasBulgarianTts: Boolean get() = ttsReady
 
     fun shakeRecognised() {
         vibrator?.vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE))
@@ -47,8 +43,10 @@ class Sounds(context: Context) : TextToSpeech.OnInitListener {
         tone?.startTone(ToneGenerator.TONE_PROP_PROMPT, 250)
     }
 
-    fun speak(text: String) {
-        if (ttsReady) tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "grandpa-msg")
+    fun speak(text: String, language: AppLanguage) {
+        if (ttsReady && tts.setLanguage(language.locale) >= TextToSpeech.LANG_AVAILABLE) {
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "grandpa-msg")
+        }
     }
 
     fun release() {

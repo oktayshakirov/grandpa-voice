@@ -46,7 +46,7 @@ const END_TOOL = {
   type: "function",
   name: "end_conversation",
   description:
-    "Приключва разговора. Извикай я само когато човекът ясно иска да приключи разговора и вече си му казал довиждане.",
+    "End the conversation after saying goodbye when the person clearly wants to finish.",
   parameters: { type: "object", properties: {}, additionalProperties: false },
 };
 
