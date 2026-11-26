@@ -1,4 +1,4 @@
-# Voice Companion for Android
+# Shake to AI for Android
 
 **Shake to talk to AI.**
 

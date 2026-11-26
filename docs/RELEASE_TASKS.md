@@ -1,4 +1,4 @@
-# Android public release tasks
+# Shake to AI release tasks
 
 ## Public concept
 
@@ -14,9 +14,9 @@ Lead with **Shake to talk to AI**. Show quick questions, thinking out loud, conv
 
 ## Name and icon
 
-- [ ] Choose the public name. Options for review are **Shake Pal**, **Shake Buddy**, **Nudge Pal**, **TalkPop**, **Shake & Say**, and **Shake to AI**. The current English build uses **Voice Companion** as a working label.
-- [ ] Check the chosen name for store and brand conflicts. Update the launcher label, documentation, and store copy. Keep the Android application ID for install compatibility.
-- [ ] Create a launcher icon with adaptive foreground and background layers, a monochrome version, and a Play Store icon. Use a clear speech or microphone symbol that remains legible at small sizes.
+- [x] Use **Shake to AI** for the launcher label, project introduction, and store listing. Keep the Android application ID for install compatibility.
+- [ ] Confirm the name in Play Console and finish the brand availability check before publication.
+- [ ] Choose one of the four icon concepts, then prepare adaptive launcher layers, a themed monochrome variant, and the Google Play icon.
 
 ## GitHub and store assets
 
@@ -24,6 +24,24 @@ Lead with **Shake to talk to AI**. Show quick questions, thinking out loud, conv
 - [ ] Publish the multilingual changes and a signed APK to GitHub Releases after testing. Use the original signing key.
 - [ ] Capture three actual Android screenshots in English after the branding is final. Show standby with “Shake to talk to AI,” the listening state with “Ask a question or think out loud,” and language selection with “Choose your conversation language.” Use test data and hide credentials. Use store copy to explain how the large controls help older adults and anyone who prefers speaking to typing.
 - [ ] If we proceed with Google Play, prepare the Android App Bundle, Play App Signing, support contact, store listing, Data safety form, privacy policy, and foreground-service declarations. Run a closed test to check whether people can complete setup on their own.
+
+### Google Play draft
+
+#### Title
+
+Shake to AI
+
+#### Short description
+
+Shake or tap to start a live AI voice conversation.
+
+#### Full description
+
+Shake your phone or tap the microphone to talk to AI. Ask a quick question, work through an idea out loud, practice speaking another language, or chat at your own pace. Say goodbye, shake again, or tap the microphone to end the conversation.
+
+A large microphone button and clear listening and speaking indicators make the app easy to use on a phone stand. Patient turn-taking gives people time to finish a thought, including older adults and anyone who prefers voice to typing.
+
+Choose your language during setup or change it in Settings. To connect, use a funded OpenAI API account or a compatible self-hosted server.
 
 ## Portfolio
 

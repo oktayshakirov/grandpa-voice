@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Voice Companion</string>
+    <string name="app_name">Shake to AI</string>
     <string name="greeting">Hello!</string>
     <string name="greeting_named">Hello, %1$s!</string>
     <string name="state_standby">I’m here for you.</string>
