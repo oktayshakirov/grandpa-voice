@@ -20,7 +20,7 @@ class SettingsRepository(context: Context) {
             backendUrl = input.backendUrl.trim(),
             deviceToken = input.deviceToken.trim(),
             userName = input.userName.trim(),
-            systemPrompt = input.systemPrompt.trim().ifBlank { Defaults.systemPrompt(input.userGender) },
+            systemPrompt = input.systemPrompt.trim(),
         )
         val editor = prefs.edit()
         secrets.put(editor, K_OPENAI_KEY, s.openAiKey)
@@ -30,6 +30,8 @@ class SettingsRepository(context: Context) {
             .putString(K_MODE, s.connectionMode)
             .putString(K_MODEL, s.model)
             .putString(K_URL, s.backendUrl)
+            .putString(K_LANGUAGE, s.language.tag)
+            .putBoolean(K_LANGUAGE_CHOSEN, s.languageChosen)
             .putString(K_NAME, s.userName)
             .putString(K_GENDER, s.userGender)
             .putString(K_PROMPT, s.systemPrompt)
@@ -54,6 +56,8 @@ class SettingsRepository(context: Context) {
     private fun load(): Settings {
         val d = Settings()
         return Settings(
+            language = AppLanguage.fromTag(prefs.getString(K_LANGUAGE, null)),
+            languageChosen = prefs.getBoolean(K_LANGUAGE_CHOSEN, prefs.contains(K_MODE)),
             connectionMode = prefs.getString(K_MODE, null) ?: defaultMode(d),
             openAiKey = secrets.get(K_OPENAI_KEY).orEmpty(),
             model = prefs.getString(K_MODEL, null) ?: d.model,
@@ -90,6 +94,8 @@ class SettingsRepository(context: Context) {
         const val K_MODEL = "model"
         const val K_URL = "backendUrl"
         const val K_TOKEN = "deviceToken"
+        const val K_LANGUAGE = "language"
+        const val K_LANGUAGE_CHOSEN = "languageChosen"
         const val K_NAME = "userName"
         const val K_GENDER = "userGender"
         const val K_PROMPT = "systemPrompt"

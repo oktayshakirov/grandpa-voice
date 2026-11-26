@@ -1,5 +1,6 @@
 package com.grandpavoice.conversation
 
+import com.grandpavoice.settings.AppLanguage
 import com.grandpavoice.settings.Defaults
 import com.grandpavoice.settings.Settings
 import org.json.JSONArray
@@ -33,7 +34,7 @@ object SessionConfig {
                     )
                     .put("output", JSONObject().put("voice", voice).put("speed", speed)),
             )
-            .put("tools", JSONArray().put(endTool()))
+            .put("tools", JSONArray().put(endTool(settings.language)))
             .put("tool_choice", "auto")
     }
 
@@ -64,13 +65,17 @@ object SessionConfig {
             .put("interrupt_response", allowInterrupt)
     }
 
-    private fun endTool() = JSONObject()
+    private fun endTool(language: AppLanguage) = JSONObject()
         .put("type", "function")
         .put("name", "end_conversation")
         .put(
             "description",
-            "Приключва разговора. Извикай я само когато човекът ясно иска да приключи разговора " +
-                "и вече си му казал довиждане.",
+            if (language == AppLanguage.BULGARIAN) {
+                "Приключва разговора. Извикай я само когато човекът ясно иска да приключи разговора " +
+                    "и вече си му казал довиждане."
+            } else {
+                "End the conversation after saying goodbye when the person clearly wants to finish."
+            },
         )
         .put(
             "parameters",

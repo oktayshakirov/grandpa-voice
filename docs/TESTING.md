@@ -10,27 +10,18 @@ adb logcat -s Conversation CompanionService
 
 ## 1. Connection
 
-In settings tap **Провери връзката**. It must show „✓ Връзката работи“. This is free: it only creates a
-one-minute key and starts no conversation. Typical failures:
-- „Ключът е грешен…“: the key was mistyped or deleted.
-- „Сметката в OpenAI няма средства“: add credit under Billing. (An account without credit may pass this check and
-  fail only when the call starts; the app then says the same thing out loud.)
+In Settings, tap **Check connection**. The result should say the connection works. This requests a temporary credential without starting a conversation. A successful check can be followed by an out-of-credit error when a call begins.
 
-Using the token broker instead? From your computer:
-`curl -X POST https://YOUR-BROKER/session -H "Authorization: Bearer YOUR-TOKEN" -d '{}'` must return `"value":"ek_…"`.
+## 2. Language and upgrade
 
-No credit yet? Everything except OpenAI itself can be tested with the mock server in `tools/mock-realtime`
-(see the README).
-
-## 2. Bulgarian quality check (before investing more time)
-
-Open the OpenAI Realtime playground (platform.openai.com › Playground › Realtime), paste the instructions from
-`settings/Defaults.kt`, choose the same voice, and speak Bulgarian slowly with pauses, the way they speak.
-If you dislike the voice, try `cedar`, `marin`, `ash`, `sage` — then set the same one in the app.
+- On a fresh installation, confirm English is preselected. Choose Spanish or German and confirm the setup screens, conversation, and spoken errors match the selection.
+- Change the language in Settings, save, and reopen the app. Verify the choice persists and the next greeting and goodbye use the selected language.
+- Update a device from the signed original APK. Verify it opens in English and retains the account and settings. Choose a different language and verify subsequent upgrades preserve that explicit preference.
+- Check French and Portuguese with the same flow. For spoken errors, install the matching Android text-to-speech voice.
 
 ## 3. Shake sensitivity
 
-Open hidden settings. Under **Разклащане** the live bar („Сега: … g“, „Разпознати: …“) updates as you move the phone; shakes here are only counted, they never start a conversation.
+Open hidden settings. Under **Shake detection**, the live meter updates as you move the phone; shakes here are only counted, they never start a conversation.
 
 - Pick the phone up, put it down, carry it across the room: the counter must **not** increase.
 - Have *them* shake it the way they naturally would: the counter **must** increase each time (beep + buzz).
@@ -39,32 +30,32 @@ Open hidden settings. Under **Разклащане** the live bar („Сега: 
 
 ## 4. First conversation (screen on)
 
-1. Shake. Expected: beep/buzz → „Свързвам се…“ → greeting in Bulgarian within ~2–4 s → „Слушам те…“.
+1. Shake. Expected: beep/buzz → connecting → greeting in the selected language → listening.
 2. Talk, pause mid-sentence for 3 seconds: it should wait, not jump in (patient turn detection).
 3. Interrupt it while it speaks: it should stop and listen.
-4. Say „Довиждане“: it should say goodbye, then the screen shows „Довиждане!“ and returns to standby.
+4. Say goodbye in the selected language. The assistant should say goodbye, then the app shows its goodbye state and returns to standby.
 5. Start again and shake during the conversation: it ends immediately.
 6. Start again and stay silent for 2 minutes: it says a short goodbye and ends.
 
 ## 5. Audio routing and echo
 
 - Phone on the table, loudspeaker, normal room: does it ever cut itself off? If yes, turn off
-  „Може да прекъсва асистента“ or choose „По тишина“ turn detection.
+  **Allow the person to interrupt the assistant** or choose the silence-based turn detection.
 - Connect Bluetooth headphones/speaker → shake → audio should go there.
 
 ## 6. Screen off / locked
 
-1. Plug in the charger, set „Екранът свети“ to *Normal phone behaviour*, wait until the screen turns off.
+1. Plug in the charger, set **Screen** to **Follow phone settings**, wait until the screen turns off.
 2. Wait 5 minutes, then 30 minutes (Doze). Shake.
    Expected: screen turns on, conversation starts. If nothing happens: battery optimisation is still on,
    or the manufacturer's battery manager killed the app (see PHONE_SETUP §4).
 
 ## 7. Failure handling
 
-- Wi-Fi off + mobile data off → shake → „Няма връзка с интернет.“ shown and spoken; back to standby after ~10 s.
-- During a conversation, turn Wi-Fi off → within ~10–30 s „Връзката прекъсна.“ → standby → shaking later works again.
-- Wrong key or device token in settings → „Приложението не е настроено правилно.“
-- Revoke microphone in Android settings → the red „Разреши микрофона“ button appears.
+- Wi-Fi off + mobile data off → shake → the no-internet error shown and spoken; back to standby after ~10 s.
+- During a conversation, turn Wi-Fi off → within ~10–30 s the connection-lost error → standby → shaking later works again.
+- Wrong key or device token in settings → the connection-setup error
+- Revoke microphone in Android settings → the red **Allow microphone access** button appears.
 
 ## 8. Reboot and interruptions
 
@@ -76,3 +67,17 @@ Open hidden settings. Under **Разклащане** the live bar („Сега: 
 
 - Android Settings › Privacy › Microphone access history: the mic is used only during conversations.
 - The status-bar microphone indicator must disappear when the conversation ends.
+
+
+## Mock server
+
+The mock server exercises the call flow without OpenAI credit. Its scripted audio is Bulgarian, so use a live OpenAI session for multilingual voice checks.
+
+```sh
+cd tools/mock-realtime
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/python mock_server.py
+```
+
+In a debug build, choose **Your own server** and use `http://10.0.2.2:8788` for the emulator or `http://<your-computer-ip>:8788` for a phone on the same network. Use `mock-device-token-for-local-testing` as the device token. Restart the server with `MOCK_FAIL=insufficient_quota` to test the out-of-credit state.

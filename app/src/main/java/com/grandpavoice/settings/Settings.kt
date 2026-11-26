@@ -12,10 +12,12 @@ data class Settings(
     val deviceToken: String = BuildConfig.DEFAULT_DEVICE_TOKEN,
 
     // Conversation
+    val language: AppLanguage = AppLanguage.ENGLISH,
+    val languageChosen: Boolean = false,
     val userName: String = "",
     /** Bulgarian is gendered: the model must say "уморена" to a woman and "уморен" to a man. */
     val userGender: String = GENDER_FEMALE,
-    val systemPrompt: String = Defaults.SYSTEM_PROMPT_FEMALE,
+    val systemPrompt: String = "",
     val model: String = Defaults.MODEL,
     val voice: String = "marin",
     val speechSpeed: Float = 0.95f,

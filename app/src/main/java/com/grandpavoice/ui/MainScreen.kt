@@ -62,9 +62,9 @@ import com.grandpavoice.R
 import com.grandpavoice.state.UiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
+import com.grandpavoice.settings.AppLanguage
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 private enum class Motion { Breathe, Ripple, Dots, None }
 
@@ -88,12 +88,12 @@ private fun lookFor(state: UiState): Look = when (state) {
 }
 
 private const val SECRET_PRESS_MS = 3_000L
-private val BULGARIAN = Locale("bg", "BG")
 
 @Composable
 fun MainScreen(
     state: UiState,
     userName: String,
+    language: AppLanguage,
     configured: Boolean,
     micGranted: Boolean,
     onMicTap: () -> Unit,
@@ -143,7 +143,7 @@ fun MainScreen(
                     }
                 },
         )
-        Clock(Modifier.padding(top = 4.dp))
+        Clock(language, Modifier.padding(top = 4.dp))
 
         Spacer(Modifier.weight(1f))
         Orb(look = look, onTap = onMicTap, enabled = configured && micGranted)
@@ -166,7 +166,7 @@ fun MainScreen(
 }
 
 @Composable
-private fun Clock(modifier: Modifier = Modifier) {
+private fun Clock(language: AppLanguage, modifier: Modifier = Modifier) {
     var now by remember { mutableStateOf(LocalDateTime.now()) }
     LaunchedEffect(Unit) {
         while (true) {
@@ -176,15 +176,15 @@ private fun Clock(modifier: Modifier = Modifier) {
     }
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            text = DateTimeFormatter.ofPattern("HH:mm", BULGARIAN).format(now),
+            text = DateTimeFormatter.ofPattern("HH:mm", language.locale).format(now),
             fontSize = 64.sp,
             fontWeight = FontWeight.Light,
             color = Palette.Ink,
             lineHeight = 70.sp,
         )
         Text(
-            text = DateTimeFormatter.ofPattern("EEEE, d MMMM", BULGARIAN).format(now)
-                .replaceFirstChar { it.titlecase(BULGARIAN) },
+            text = DateTimeFormatter.ofPattern("EEEE, d MMMM", language.locale).format(now)
+                .replaceFirstChar { it.titlecase(language.locale) },
             fontSize = 24.sp,
             color = Palette.Secondary,
         )

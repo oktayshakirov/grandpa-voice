@@ -9,6 +9,7 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.annotation.StringRes
 import com.grandpavoice.R
+import com.grandpavoice.settings.forLanguage
 import com.grandpavoice.settings.SettingsRepository
 import com.grandpavoice.state.CompanionState
 import com.grandpavoice.state.UiState
@@ -48,6 +49,7 @@ class ConversationManager(
     private var client: RealtimeClient? = null
     private var sessionId = 0
     private var sessionInstructions = ""
+    private var sessionSettings = settingsRepo.current
 
     private var connectJob: Job? = null
     private var inactivityJob: Job? = null
@@ -72,6 +74,8 @@ class ConversationManager(
         aiSpeaking = false
         startedAtMs = SystemClock.elapsedRealtime()
         val mySession = ++sessionId
+        val settings = settingsRepo.current
+        sessionSettings = settings
         CompanionState.set(UiState.Connecting)
 
         connectJob = scope.launch {
@@ -84,7 +88,6 @@ class ConversationManager(
                     fail(R.string.error_no_internet)
                     return@launch
                 }
-                val settings = settingsRepo.current
                 sessionInstructions = Instructions.build(settings)
                 val ticket = withContext(Dispatchers.IO) { keys.fetch(settings, sessionInstructions) }
                 if (mySession != sessionId) return@launch
@@ -142,12 +145,12 @@ class ConversationManager(
 
     private fun onChannelOpened() {
         CompanionState.set(UiState.Thinking)
-        requestResponse(Instructions.greeting(settingsRepo.current), allowTools = false)
+        requestResponse(Instructions.greeting(sessionSettings), allowTools = false)
         val minutes = settingsRepo.current.maxSessionMinutes.coerceAtLeast(1)
         maxDurationJob?.cancel()
         maxDurationJob = scope.launch {
             delay(minutes * 60_000L)
-            requestFarewell(Instructions.FAREWELL_TIME_LIMIT)
+            requestFarewell(Instructions.farewellTimeLimit(sessionSettings.language))
         }
     }
 
@@ -214,7 +217,7 @@ class ConversationManager(
                                 .put("output", "{\"ok\":true}"),
                         ),
                 )
-                requestFarewell(Instructions.FAREWELL_USER)
+                requestFarewell(Instructions.farewellUser(sessionSettings.language))
             }
             return
         }
@@ -279,7 +282,7 @@ class ConversationManager(
         val seconds = settingsRepo.current.inactivitySeconds.coerceAtLeast(15)
         inactivityJob = scope.launch {
             delay(seconds * 1000L)
-            requestFarewell(Instructions.FAREWELL_INACTIVITY)
+            requestFarewell(Instructions.farewellInactivity(sessionSettings.language))
         }
     }
 
@@ -302,7 +305,9 @@ class ConversationManager(
     private fun fail(@StringRes message: Int) {
         teardown()
         CompanionState.set(UiState.Error(message))
-        sounds.speak(context.getString(message) + " " + context.getString(R.string.hint_try_again))
+        val language = settingsRepo.current.language
+        val localized = context.forLanguage(language)
+        sounds.speak(localized.getString(message) + " " + localized.getString(R.string.hint_try_again), language)
         resetJob = scope.launch {
             delay(ERROR_SCREEN_MS)
             if (!isActive) CompanionState.set(UiState.Standby)

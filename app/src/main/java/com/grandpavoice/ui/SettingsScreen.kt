@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -53,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.grandpavoice.R
+import com.grandpavoice.settings.AppLanguage
 import com.grandpavoice.settings.Defaults
 import com.grandpavoice.settings.Settings
 import com.grandpavoice.state.CompanionState
@@ -71,6 +73,7 @@ interface SettingsActions {
     fun openAppSettings()
     fun exitKiosk()
     fun removeDeviceOwner()
+    fun openFeedback(feature: Boolean): Boolean
 
     /** Asks OpenAI (or the server) for a short-lived key with these settings. Free; nothing is spoken. */
     suspend fun testConnection(settings: Settings): TestResult
@@ -90,6 +93,7 @@ fun SettingsScreen(
     var showSecret by remember { mutableStateOf(false) }
     var testing by remember { mutableStateOf(false) }
     var testResult by remember { mutableStateOf<TestResult?>(null) }
+    var feedbackUnavailable by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val liveG by CompanionState.liveShakeG.collectAsStateWithLifecycle()
     val shakes by CompanionState.shakeTriggers.collectAsStateWithLifecycle()
@@ -114,7 +118,7 @@ fun SettingsScreen(
                 .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("Настройки", fontSize = 30.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+            Text(stringResource(R.string.settings_title), fontSize = 30.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
             Box(
                 Modifier
                     .size(48.dp)
@@ -123,7 +127,7 @@ fun SettingsScreen(
                     .clickable(onClick = onClose),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(painterResource(R.drawable.ic_close), "Затвори", tint = Palette.Ink, modifier = Modifier.size(24.dp))
+                Icon(painterResource(R.drawable.ic_close), stringResource(R.string.close), tint = Palette.Ink, modifier = Modifier.size(24.dp))
             }
         }
 
@@ -134,26 +138,25 @@ fun SettingsScreen(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Note("За близкия, който подготвя телефона. Отваря се, като задържите поздрава 3 секунди.")
+            Note(stringResource(R.string.settings_intro))
 
-            Section("Връзка с OpenAI") {
+            Section(stringResource(R.string.openai_connection)) {
                 Segmented(
-                    options = listOf(Settings.MODE_OPENAI_KEY to "Ключ от OpenAI", Settings.MODE_SERVER to "Собствен сървър"),
+                    options = listOf(Settings.MODE_OPENAI_KEY to stringResource(R.string.connection_key), Settings.MODE_SERVER to stringResource(R.string.connection_server)),
                     selected = s.connectionMode,
                 ) { s = s.copy(connectionMode = it); testResult = null }
 
                 if (s.connectionMode == Settings.MODE_OPENAI_KEY) {
-                    SecretField("API ключ (sk-…)", s.openAiKey, showSecret) { s = s.copy(openAiKey = it); testResult = null }
+                    SecretField(stringResource(R.string.api_key), s.openAiKey, showSecret) { s = s.copy(openAiKey = it); testResult = null }
                     Note(
-                        "Създайте ключ на platform.openai.com → API keys и задайте месечен лимит в Billing. " +
-                            "Ключът се пази шифрован само на този телефон.",
+                        stringResource(R.string.api_key_note),
                     )
                 } else {
-                    Field("Адрес на сървъра (https://…)", s.backendUrl, KeyboardType.Uri) { s = s.copy(backendUrl = it); testResult = null }
-                    SecretField("Ключ на устройството (DEVICE_TOKEN)", s.deviceToken, showSecret) { s = s.copy(deviceToken = it); testResult = null }
-                    Note("Сървърът пази ключа от OpenAI. Вижте backend/README.md.")
+                    Field(stringResource(R.string.server_address), s.backendUrl, KeyboardType.Uri) { s = s.copy(backendUrl = it); testResult = null }
+                    SecretField(stringResource(R.string.device_token), s.deviceToken, showSecret) { s = s.copy(deviceToken = it); testResult = null }
+                    Note(stringResource(R.string.server_note))
                 }
-                SwitchRow("Покажи ключа", showSecret) { showSecret = it }
+                SwitchRow(stringResource(R.string.show_key), showSecret) { showSecret = it }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Button(
@@ -168,7 +171,7 @@ fun SettingsScreen(
                         enabled = !testing && s.isConfigured,
                         shape = RoundedCornerShape(24.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Palette.Surface3, contentColor = Palette.Ink),
-                    ) { Text(if (testing) "Проверявам…" else "Провери връзката", fontSize = 16.sp) }
+                    ) { Text(if (testing) stringResource(R.string.testing_connection) else stringResource(R.string.test_connection), fontSize = 16.sp) }
                 }
                 testResult?.let {
                     Text(
@@ -179,34 +182,42 @@ fun SettingsScreen(
                 }
             }
 
-            Section("Човекът") {
-                Segmented(
-                    options = listOf(Settings.GENDER_FEMALE to "Жена", Settings.GENDER_MALE to "Мъж"),
-                    selected = s.userGender,
-                ) { gender ->
-                    // An unedited default prompt switches along with the gender.
-                    val prompt = if (Defaults.isDefaultPrompt(s.systemPrompt)) Defaults.systemPrompt(gender) else s.systemPrompt
-                    s = s.copy(userGender = gender, systemPrompt = prompt)
+            Section(stringResource(R.string.language)) {
+                LanguagePicker(s.language) {
+                    s = s.copy(language = it)
+                    testResult = null
                 }
-                Note("Българският има род: асистентът ще казва „уморена ли си“ на жена и „уморен ли си“ на мъж.")
-                Field("Име, с което да се обръща (по желание)", s.userName) { s = s.copy(userName = it) }
             }
 
-            Section("Глас") {
-                Label("Модел")
+            Section(stringResource(R.string.person)) {
+                if (s.language == AppLanguage.BULGARIAN) {
+                    Segmented(
+                        options = listOf(
+                            Settings.GENDER_FEMALE to stringResource(R.string.gender_female),
+                            Settings.GENDER_MALE to stringResource(R.string.gender_male),
+                        ),
+                        selected = s.userGender,
+                    ) { s = s.copy(userGender = it) }
+                    Note(stringResource(R.string.gender_note))
+                }
+                Field(stringResource(R.string.preferred_name), s.userName) { s = s.copy(userName = it) }
+            }
+
+            Section(stringResource(R.string.voice)) {
+                Label(stringResource(R.string.model))
                 RadioGroup(
                     listOf(
-                        Defaults.MODEL to "Най-естествен глас (${Defaults.MODEL})",
-                        Defaults.MODEL_ECONOMY to "По-евтин (${Defaults.MODEL_ECONOMY})",
+                        Defaults.MODEL to stringResource(R.string.natural_model, Defaults.MODEL),
+                        Defaults.MODEL_ECONOMY to stringResource(R.string.economy_model, Defaults.MODEL_ECONOMY),
                     ),
                     s.model,
                 ) { s = s.copy(model = it) }
-                Field("Друг модел (по желание)", s.model) { s = s.copy(model = it) }
-                Label("Глас")
+                Field(stringResource(R.string.other_model), s.model) { s = s.copy(model = it) }
+                Label(stringResource(R.string.voice))
                 Chips(Defaults.VOICES, s.voice) { s = s.copy(voice = it) }
-                Note("marin и cedar звучат най-естествено.")
+                Note(stringResource(R.string.voice_note))
                 SliderRow(
-                    label = "Скорост на говорене",
+                    label = stringResource(R.string.speech_speed),
                     valueText = String.format(Locale.US, "%.2f×", s.speechSpeed),
                     value = s.speechSpeed,
                     range = 0.7f..1.2f,
@@ -214,84 +225,84 @@ fun SettingsScreen(
                 ) { s = s.copy(speechSpeed = (it * 20).roundToInt() / 20f) }
             }
 
-            Section("Разговор") {
-                Label("Кога асистентът да реши, че човекът е спрял да говори")
+            Section(stringResource(R.string.conversation)) {
+                Label(stringResource(R.string.turn_detection))
                 RadioGroup(
                     listOf(
-                        Settings.VAD_SEMANTIC_LOW to "Търпеливо – изчаква паузите (препоръчително)",
-                        Settings.VAD_SEMANTIC_MEDIUM to "Нормално",
-                        Settings.VAD_SERVER_PATIENT to "По тишина – след около 1,2 секунди мълчание",
+                        Settings.VAD_SEMANTIC_LOW to stringResource(R.string.turn_detection_patient),
+                        Settings.VAD_SEMANTIC_MEDIUM to stringResource(R.string.turn_detection_normal),
+                        Settings.VAD_SERVER_PATIENT to stringResource(R.string.turn_detection_silence),
                     ),
                     s.vadMode,
                 ) { s = s.copy(vadMode = it) }
-                SwitchRow("Може да прекъсва асистента, докато говори", s.allowInterrupt) { s = s.copy(allowInterrupt = it) }
-                Note("Изключете само ако асистентът сам се прекъсва, защото микрофонът чува високоговорителя.")
-                SliderRow("Край след мълчание", "${s.inactivitySeconds} сек", s.inactivitySeconds.toFloat(), 30f..600f, 18) {
+                SwitchRow(stringResource(R.string.allow_interrupt), s.allowInterrupt) { s = s.copy(allowInterrupt = it) }
+                Note(stringResource(R.string.interrupt_note))
+                SliderRow(stringResource(R.string.idle_timeout), stringResource(R.string.seconds, s.inactivitySeconds), s.inactivitySeconds.toFloat(), 30f..600f, 18) {
                     s = s.copy(inactivitySeconds = ((it / 30f).roundToInt() * 30).coerceIn(30, 600))
                 }
-                SliderRow("Най-дълъг разговор", "${s.maxSessionMinutes} мин", s.maxSessionMinutes.toFloat(), 5f..60f, 10) {
+                SliderRow(stringResource(R.string.max_duration), stringResource(R.string.minutes, s.maxSessionMinutes), s.maxSessionMinutes.toFloat(), 5f..60f, 10) {
                     s = s.copy(maxSessionMinutes = ((it / 5f).roundToInt() * 5).coerceIn(5, 60))
                 }
-                SwitchRow("Максимална сила на звука при разговор", s.maxVolume) { s = s.copy(maxVolume = it) }
+                SwitchRow(stringResource(R.string.max_volume), s.maxVolume) { s = s.copy(maxVolume = it) }
             }
 
-            Section("Разклащане") {
+            Section(stringResource(R.string.shake)) {
                 ShakeMeter(liveG, s.shakeThresholdG, shakes)
-                Note("Докато тази страница е отворена, разклащането само се отчита и не започва разговор.")
+                Note(stringResource(R.string.shake_note))
                 SliderRow(
-                    label = "Праг (по-ниско = по-чувствително)",
+                    label = stringResource(R.string.threshold),
                     valueText = String.format(Locale.US, "%.1f g", s.shakeThresholdG),
                     value = s.shakeThresholdG,
                     range = 1.5f..3.5f,
                     steps = 19,
                 ) { s = s.copy(shakeThresholdG = (it * 10).roundToInt() / 10f) }
-                SliderRow("Нужни тласъци", "${s.shakeCount}", s.shakeCount.toFloat(), 2f..8f, 5) {
+                SliderRow(stringResource(R.string.shake_count), "${s.shakeCount}", s.shakeCount.toFloat(), 2f..8f, 5) {
                     s = s.copy(shakeCount = it.roundToInt())
                 }
-                SliderRow("В рамките на", "${s.shakeWindowMs} мс", s.shakeWindowMs.toFloat(), 800f..3000f, 21) {
+                SliderRow(stringResource(R.string.shake_window), stringResource(R.string.milliseconds, s.shakeWindowMs), s.shakeWindowMs.toFloat(), 800f..3000f, 21) {
                     s = s.copy(shakeWindowMs = ((it / 100f).roundToInt() * 100))
                 }
-                SliderRow("Пауза след разклащане", "${s.cooldownMs / 1000.0} сек", s.cooldownMs.toFloat(), 1000f..10000f, 17) {
+                SliderRow(stringResource(R.string.shake_cooldown), stringResource(R.string.decimal_seconds, s.cooldownMs / 1000.0), s.cooldownMs.toFloat(), 1000f..10000f, 17) {
                     s = s.copy(cooldownMs = ((it / 500f).roundToInt() * 500))
                 }
-                SwitchRow("Разпознавай и при изгасен екран (харчи батерия)", s.detectWhenScreenOff) {
+                SwitchRow(stringResource(R.string.shake_screen_off), s.detectWhenScreenOff) {
                     s = s.copy(detectWhenScreenOff = it)
                 }
             }
 
-            Section("Екран") {
+            Section(stringResource(R.string.screen)) {
                 RadioGroup(
                     listOf(
-                        Settings.SCREEN_ON_CHARGING to "Свети, докато телефонът се зарежда",
-                        Settings.SCREEN_ON_ALWAYS to "Свети винаги",
-                        Settings.SCREEN_ON_NEVER to "Нормално поведение на телефона",
+                        Settings.SCREEN_ON_CHARGING to stringResource(R.string.screen_charging),
+                        Settings.SCREEN_ON_ALWAYS to stringResource(R.string.screen_always),
+                        Settings.SCREEN_ON_NEVER to stringResource(R.string.screen_normal),
                     ),
                     s.keepScreenOn,
                 ) { s = s.copy(keepScreenOn = it) }
-                SwitchRow("Затъмни екрана, когато не се използва", s.dimWhenIdle) { s = s.copy(dimWhenIdle = it) }
+                SwitchRow(stringResource(R.string.dim_idle), s.dimWhenIdle) { s = s.copy(dimWhenIdle = it) }
             }
 
-            Section("Телефон") {
+            Section(stringResource(R.string.phone)) {
                 Status(
                     actions.hasBatteryExemption,
-                    "Оптимизацията на батерията е изключена.",
-                    "Оптимизацията на батерията е включена – Android може да спре приложението.",
+                    stringResource(R.string.battery_exempt),
+                    stringResource(R.string.battery_optimized),
                 )
-                SecondaryButton("Изключи оптимизацията на батерията", actions::requestBatteryExemption)
-                SecondaryButton("Направи го начален екран (Home)", actions::openHomeSettings)
-                SecondaryButton("Разрешения на приложението", actions::openAppSettings)
+                SecondaryButton(stringResource(R.string.battery_button), actions::requestBatteryExemption)
+                SecondaryButton(stringResource(R.string.home_button), actions::openHomeSettings)
+                SecondaryButton(stringResource(R.string.permissions_button), actions::openAppSettings)
                 Note(
                     when {
-                        actions.isInLockTask -> "Киоск режимът е включен."
-                        actions.isDeviceOwner -> "Приложението е собственик на устройството (киоск режимът е на пауза)."
-                        else -> "Киоск режимът не е настроен (по желание, вижте инструкциите)."
+                        actions.isInLockTask -> stringResource(R.string.kiosk_active)
+                        actions.isDeviceOwner -> stringResource(R.string.kiosk_paused)
+                        else -> stringResource(R.string.kiosk_not_configured)
                     },
                 )
-                if (actions.isInLockTask) SecondaryButton("Излез от киоск режим до рестарт", actions::exitKiosk)
-                if (actions.isDeviceOwner) SecondaryButton("Премахни киоск режима напълно", actions::removeDeviceOwner)
+                if (actions.isInLockTask) SecondaryButton(stringResource(R.string.kiosk_exit), actions::exitKiosk)
+                if (actions.isDeviceOwner) SecondaryButton(stringResource(R.string.kiosk_remove), actions::removeDeviceOwner)
             }
 
-            Section("Инструкции към асистента") {
+            Section(stringResource(R.string.assistant_instructions)) {
                 OutlinedTextField(
                     value = Defaults.effectivePrompt(s),
                     onValueChange = { s = s.copy(systemPrompt = it) },
@@ -301,11 +312,21 @@ fun SettingsScreen(
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth(),
                 )
-                SecondaryButton("Върни инструкциите по подразбиране") { s = s.copy(systemPrompt = Defaults.systemPrompt(s.userGender)) }
-                Note("Правилата за български език и за край на разговора се добавят автоматично и винаги важат.")
+                SecondaryButton(stringResource(R.string.reset_instructions)) { s = s.copy(systemPrompt = "") }
+                Note(stringResource(R.string.instructions_note))
             }
 
-            Note("Версия ${actions.appVersion}")
+            Section(stringResource(R.string.feedback)) {
+                SecondaryButton(stringResource(R.string.report_bug)) {
+                    feedbackUnavailable = !actions.openFeedback(feature = false)
+                }
+                SecondaryButton(stringResource(R.string.suggest_feature)) {
+                    feedbackUnavailable = !actions.openFeedback(feature = true)
+                }
+                if (feedbackUnavailable) Note(stringResource(R.string.feedback_unavailable))
+            }
+
+            Note(stringResource(R.string.version, actions.appVersion))
             Spacer(Modifier.height(16.dp))
         }
 
@@ -323,7 +344,7 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(60.dp),
-            ) { Text("Запази", fontSize = 20.sp, fontWeight = FontWeight.SemiBold) }
+            ) { Text(stringResource(R.string.save), fontSize = 20.sp, fontWeight = FontWeight.SemiBold) }
         }
     }
 }
@@ -333,7 +354,7 @@ fun SettingsScreen(
 @Composable
 private fun Section(title: String, content: @Composable ColumnScope.() -> Unit) {
     Text(
-        title.uppercase(Locale("bg")),
+        title,
         fontSize = 13.sp,
         fontWeight = FontWeight.SemiBold,
         color = Palette.Secondary,
@@ -460,7 +481,7 @@ private fun SliderRow(
 }
 
 @Composable
-private fun <T> RadioGroup(options: List<Pair<T, String>>, selected: T, onSelect: (T) -> Unit) {
+internal fun <T> RadioGroup(options: List<Pair<T, String>>, selected: T, onSelect: (T) -> Unit) {
     Column {
         options.forEach { (value, label) ->
             Row(
@@ -540,8 +561,8 @@ private fun ShakeMeter(liveG: Float, threshold: Float, recognised: Int) {
     val max = 4f
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(String.format(Locale.US, "Сега: %.1f g", liveG), fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
-            Text("Разпознати: $recognised", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = Palette.Accent)
+            Text(stringResource(R.string.shake_current, liveG), fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.shake_recognized, recognised), fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = Palette.Accent)
         }
         Box(
             Modifier

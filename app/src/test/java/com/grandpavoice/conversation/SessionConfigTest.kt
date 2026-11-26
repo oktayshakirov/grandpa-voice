@@ -7,7 +7,7 @@ import org.junit.Test
 
 class SessionConfigTest {
 
-    @Test fun defaultSessionIsPatientBulgarianAudio() {
+    @Test fun defaultSessionUsesPatientAudio() {
         val s = SessionConfig.build(Settings(), "инструкции")
         assertEquals("realtime", s.getString("type"))
         assertEquals("gpt-realtime-1.5", s.getString("model"))

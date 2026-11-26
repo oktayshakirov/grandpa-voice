@@ -4,30 +4,24 @@ Do these steps yourself before giving them the phone. They should never need to 
 
 ## 1. Basic Android settings
 
-1. **Screen lock → None** (Settings › Security › Screen lock). With a PIN/pattern the app cannot start after a reboot
-   until someone unlocks, and the lock screen gets in the way of a "just shake it" experience.
-2. **Language:** Bulgarian (optional, but makes system pop-ups understandable for them).
-3. **Volume:** turn media and call volume up. The app also sets call volume to maximum during conversations
-   (switchable in settings).
-4. **Display › Screen timeout:** anything; the app keeps the screen on while charging.
-5. **Wi-Fi:** connect and make sure it reconnects automatically. Mobile data as a backup is ideal.
-6. **Text-to-speech:** Settings › System › Languages › Text-to-speech output → install **Bulgarian** voice data
-   for Google's speech engine. Used only to say error messages ("Няма връзка с интернет") when OpenAI is unreachable.
+1. **Screen lock:** If the phone requires a PIN after reboot, unlock it before using the shake gesture.
+2. **System language:** Set Android to the language the person reads so they can understand system prompts.
+3. **Volume:** Check media and call volume. The app can raise call volume during conversations, controlled from Settings.
+4. **Display:** By default, the app keeps the screen on while charging. Change this in Settings → Screen.
+5. **Connection:** Connect to Wi-Fi and make sure it reconnects automatically.
+6. **Text-to-speech:** Install voice data for the selected language in Android's text-to-speech settings if you want the phone to speak local errors aloud.
 
 ## 2. Install and first start
 
-1. Install the APK (see README).
-2. Open **Събеседник**. Allow **Microphone** and **Notifications** when asked.
-3. Tap **Настрой** (first start) or press and hold „Здравей!“ for 3 seconds → **Settings**:
-   - under **Връзка с OpenAI**, paste your OpenAI API key (or choose **Собствен сървър** and enter the
-     server address and device token if you run the token broker), then tap **Провери връзката**,
-   - choose **Жена** or **Мъж** (Bulgarian is gendered) and optionally a name (e.g. „бабо Мария“ or just „Марийке“). This is how it will address them,
-   - tap **Изключи оптимизацията на батерията** and confirm,
-   - tap **Направи го начален екран (Home)** and choose Събеседник as the Home app (choose "Always"),
-   - **Запази**.
+1. Install the APK from [GitHub Releases](https://github.com/oktayshakirov/grandpa-voice/releases), or build it from the [README](../README.md).
+2. Open the app, choose the interface and conversation language, and allow microphone access when prompted.
+3. Under **OpenAI connection**, enter an API key or choose **Your own server** and enter its address and device token. Tap **Check connection**.
+4. Under **About you**, optionally enter a name. When Bulgarian is selected, choose the grammatical gender as well.
+5. Tap **Save**. Shake the phone or tap the microphone to start talking.
 
-Choosing it as the Home app is what makes it start automatically after a reboot and makes the Home button
-always come back to it.
+To open Settings again, hold the greeting for three seconds.
+
+For screen-off shake detection on a dedicated phone, the **Phone** section offers battery optimization settings. You can also use **Set as Home app** so the Home button returns to the companion and Android opens it as the launcher after reboot and unlock.
 
 ## 3. Permissions the app uses
 
@@ -46,7 +40,7 @@ always come back to it.
 
 Many phones have extra battery managers on top of Android's. Look up your model on **dontkillmyapp.com**. Typical:
 
-- **Samsung:** Settings › Battery › Background usage limits → add Събеседник to *Never sleeping apps*.
+- **Samsung:** Settings › Battery › Background usage limits → add the app to *Never sleeping apps*.
 - **Xiaomi / Redmi / POCO:** App info › Battery saver → *No restrictions*; also enable *Autostart*.
 - **Huawei / Honor:** App launch → turn off *Manage automatically*, enable all three toggles.
 - **OnePlus / Oppo / Realme:** Battery › App battery management → *Allow background activity*; lock the app in Recents.
@@ -70,8 +64,8 @@ accounts temporarily).
 3. Open the app. It enters lock-task mode automatically, disables the status bar and the lock screen,
    and pins itself as the Home app.
 
-To leave kiosk mode: hold the greeting 3 s → Settings → **Излез от киоск режим до рестарт** (temporary) or
-**Премахни киоск режима напълно** (permanent; needed before you can uninstall the app).
+To leave kiosk mode: hold the greeting 3 s → Settings → **Exit kiosk mode until restart** (temporary) or
+**Remove kiosk mode** (permanent; needed before you can uninstall the app).
 
 Kiosk mode is optional. The Home-app setup in step 2 already gives most of the benefit.
 

@@ -36,7 +36,7 @@ object Notifications {
         )
         return NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_mic)
-            .setContentTitle(context.getString(R.string.notif_title))
+            .setContentTitle(context.getString(R.string.notif_title, context.getString(R.string.app_name)))
             .setContentText(context.getString(R.string.notif_text))
             .setOngoing(true)
             .setSilent(true)
