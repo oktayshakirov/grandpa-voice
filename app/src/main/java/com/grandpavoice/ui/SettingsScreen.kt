@@ -73,7 +73,6 @@ interface SettingsActions {
     fun openAppSettings()
     fun exitKiosk()
     fun removeDeviceOwner()
-    fun openFeedback(feature: Boolean): Boolean
 
     /** Asks OpenAI (or the server) for a short-lived key with these settings. Free; nothing is spoken. */
     suspend fun testConnection(settings: Settings): TestResult
@@ -93,7 +92,6 @@ fun SettingsScreen(
     var showSecret by remember { mutableStateOf(false) }
     var testing by remember { mutableStateOf(false) }
     var testResult by remember { mutableStateOf<TestResult?>(null) }
-    var feedbackUnavailable by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val liveG by CompanionState.liveShakeG.collectAsStateWithLifecycle()
     val shakes by CompanionState.shakeTriggers.collectAsStateWithLifecycle()
@@ -314,16 +312,6 @@ fun SettingsScreen(
                 )
                 SecondaryButton(stringResource(R.string.reset_instructions)) { s = s.copy(systemPrompt = "") }
                 Note(stringResource(R.string.instructions_note))
-            }
-
-            Section(stringResource(R.string.feedback)) {
-                SecondaryButton(stringResource(R.string.report_bug)) {
-                    feedbackUnavailable = !actions.openFeedback(feature = false)
-                }
-                SecondaryButton(stringResource(R.string.suggest_feature)) {
-                    feedbackUnavailable = !actions.openFeedback(feature = true)
-                }
-                if (feedbackUnavailable) Note(stringResource(R.string.feedback_unavailable))
             }
 
             Note(stringResource(R.string.version, actions.appVersion))

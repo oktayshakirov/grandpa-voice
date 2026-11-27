@@ -1,6 +1,6 @@
 # Setting up the phone (once, ≈15 minutes)
 
-Do these steps yourself before giving them the phone. They should never need to see any of it.
+Use these steps to set up Shake to AI on an Android phone.
 
 ## 1. Basic Android settings
 
@@ -13,7 +13,7 @@ Do these steps yourself before giving them the phone. They should never need to 
 
 ## 2. Install and first start
 
-1. Install the APK from [GitHub Releases](https://github.com/oktayshakirov/grandpa-voice/releases), or build it from the [README](../README.md).
+1. [Build the app from source](../README.md#build-from-source) and install it.
 2. Open the app, choose the interface and conversation language, and allow microphone access when prompted.
 3. Under **OpenAI connection**, enter an API key or choose **Your own server** and enter its address and device token. Tap **Check connection**.
 4. Under **About you**, optionally enter a name. When Bulgarian is selected, choose the grammatical gender as well.
@@ -57,9 +57,9 @@ accounts temporarily).
 1. Enable Developer options (tap *Build number* 7×) → enable **USB debugging**.
 2. Connect to a computer with `adb` and run:
    ```bash
-   adb shell dpm set-device-owner com.grandpavoice/.kiosk.AdminReceiver
+   adb shell dpm set-device-owner com.shadev.shaketoai/com.grandpavoice.kiosk.AdminReceiver
    ```
-   Expected output: `Success: Device owner set to package com.grandpavoice`.
+   Expected output: `Success: Device owner set to package com.shadev.shaketoai`.
    If it says the device already has accounts, remove them (Settings › Accounts) and retry.
 3. Open the app. It enters lock-task mode automatically, disables the status bar and the lock screen,
    and pins itself as the Home app.

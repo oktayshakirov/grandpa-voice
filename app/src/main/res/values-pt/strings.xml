@@ -114,8 +114,4 @@
     <string name="test_rate_limited">Demasiados pedidos. Tenta novamente daqui a pouco.</string>
     <string name="test_network">Não foi possível aceder à Internet ou ao servidor.</string>
     <string name="test_error">Erro do serviço</string>
-    <string name="feedback">Sugestões</string>
-    <string name="report_bug">Comunicar um problema</string>
-    <string name="suggest_feature">Sugerir uma funcionalidade</string>
-    <string name="feedback_unavailable">Abre o GitHub num navegador para enviar comentários.</string>
 </resources>

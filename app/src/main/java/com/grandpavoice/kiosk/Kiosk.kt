@@ -11,9 +11,8 @@ import android.os.Build
 import com.grandpavoice.ui.MainActivity
 
 /**
- * Optional dedicated-device ("kiosk") mode. Works only if the app was made device owner with
- *   adb shell dpm set-device-owner com.grandpavoice/.kiosk.AdminReceiver
- * Without that, every function here is a harmless no-op.
+ * Optional dedicated-device ("kiosk") mode. Set up the device owner as described in
+ * docs/PHONE_SETUP.md before enabling kiosk mode.
  */
 object Kiosk {
 

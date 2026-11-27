@@ -1,11 +1,8 @@
 package com.grandpavoice.settings
 
 object Defaults {
-    /**
-     * Editable in the hidden settings. Language, gender and goodbye rules are appended separately and always apply.
-     * Bulgarian is gendered, so there is one version for a woman and one for a man.
-     */
-    val SYSTEM_PROMPT_FEMALE = """
+    // Recognize saved defaults from older installations so they can use the current prompt.
+    internal val LEGACY_SYSTEM_PROMPT_FEMALE = """
 Ти си приятелски настроен, търпелив и сърдечен събеседник за възрастна жена.
 Говори естествено, топло и спокойно на български език.
 Използвай кратки и лесни за разбиране изречения, освен ако тя не поиска повече подробности.
@@ -19,7 +16,7 @@ object Defaults {
 Винаги говори на български език.
 """.trim()
 
-    val SYSTEM_PROMPT_MALE = """
+    private val LEGACY_SYSTEM_PROMPT_MALE = """
 Ти си приятелски настроен, търпелив и сърдечен събеседник за възрастен мъж.
 Говори естествено, топло и спокойно на български език.
 Използвай кратки и лесни за разбиране изречения, освен ако той не поиска повече подробности.
@@ -43,22 +40,16 @@ Use short, clear sentences. Give the person time to think and speak, and gently 
 Stay with the person's topic and speak in a friendly, everyday tone.
 """.trim()
 
-    fun systemPrompt(settings: Settings) = when {
-        settings.language != AppLanguage.BULGARIAN -> SYSTEM_PROMPT_GENERAL
-        settings.userGender == Settings.GENDER_MALE -> SYSTEM_PROMPT_MALE
-        else -> SYSTEM_PROMPT_FEMALE
-    }
-
-    /** True if the prompt is one of the built-in defaults (not edited by the family). */
+    /** True if the prompt matches a current or previously shipped default. */
     fun isDefaultPrompt(prompt: String): Boolean {
         val p = prompt.trim()
-        return p.isEmpty() || p == SYSTEM_PROMPT_GENERAL || p == SYSTEM_PROMPT_FEMALE || p == SYSTEM_PROMPT_MALE ||
+        return p.isEmpty() || p == SYSTEM_PROMPT_GENERAL ||
+            p == LEGACY_SYSTEM_PROMPT_FEMALE || p == LEGACY_SYSTEM_PROMPT_MALE ||
             (p.startsWith(SYSTEM_PROMPT_LEGACY_START) && p.lines().size == 11)
     }
 
-    /** The prompt actually used: an unedited default always follows the chosen gender. */
     fun effectivePrompt(settings: Settings): String =
-        if (isDefaultPrompt(settings.systemPrompt)) systemPrompt(settings) else settings.systemPrompt
+        if (isDefaultPrompt(settings.systemPrompt)) SYSTEM_PROMPT_GENERAL else settings.systemPrompt
 
     /**
      * Realtime models offered in settings. gpt-realtime-1.5 is OpenAI's audio-in/audio-out voice model;

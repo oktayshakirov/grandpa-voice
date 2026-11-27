@@ -114,8 +114,4 @@
     <string name="test_rate_limited">Zu viele Anfragen. Versuche es gleich noch einmal.</string>
     <string name="test_network">Keine Verbindung zum Internet oder zum Server.</string>
     <string name="test_error">Dienstfehler</string>
-    <string name="feedback">Feedback</string>
-    <string name="report_bug">Fehler melden</string>
-    <string name="suggest_feature">Funktion vorschlagen</string>
-    <string name="feedback_unavailable">Öffne GitHub im Browser, um Feedback zu senden.</string>
 </resources>

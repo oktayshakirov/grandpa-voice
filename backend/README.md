@@ -49,7 +49,7 @@ cloudflared tunnel --url http://localhost:8787
 
 - **Render / Railway:** create a new Web Service from this folder (Node, start command `node server.js`),
   add the environment variables, choose an always-on instance. Use the https URL they give you.
-- **Fly.io / any Docker host:** `docker build -t grandpa-broker . && docker run -p 8787:8787 --env-file .env grandpa-broker`
+- **Fly.io / any Docker host:** `docker build -t shake-to-ai-broker . && docker run -p 8787:8787 --env-file .env shake-to-ai-broker`
   behind HTTPS (Fly provides it; on a VPS put Caddy in front: `caddy reverse-proxy --from your.domain --to :8787`).
 
 ## Checking it works with OpenAI

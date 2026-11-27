@@ -313,17 +313,6 @@ class MainActivity : ComponentActivity() {
 
         override fun openAppSettings() = this@MainActivity.openAppSettings()
 
-        override fun openFeedback(feature: Boolean): Boolean {
-            val title = if (feature) "Feature request: " else "Bug report: "
-            val body = if (feature) "" else "App version: $appVersion\nAndroid: ${Build.VERSION.RELEASE}\n\n"
-            val url = Uri.parse("https://github.com/oktayshakirov/grandpa-voice/issues/new")
-                .buildUpon()
-                .appendQueryParameter("title", title)
-                .appendQueryParameter("body", body)
-                .build()
-            return runCatching { startActivity(Intent(Intent.ACTION_VIEW, url)) }.isSuccess
-        }
-
         override val appVersion: String = BuildConfig.VERSION_NAME
 
         override suspend fun testConnection(settings: Settings): TestResult = withContext(Dispatchers.IO) {

@@ -114,8 +114,4 @@
     <string name="test_rate_limited">Trop de requêtes. Réessaie dans un instant.</string>
     <string name="test_network">Impossible de joindre Internet ou le serveur.</string>
     <string name="test_error">Erreur du service</string>
-    <string name="feedback">Commentaires</string>
-    <string name="report_bug">Signaler un problème</string>
-    <string name="suggest_feature">Suggérer une fonctionnalité</string>
-    <string name="feedback_unavailable">Ouvre GitHub dans un navigateur pour envoyer un commentaire.</string>
 </resources>

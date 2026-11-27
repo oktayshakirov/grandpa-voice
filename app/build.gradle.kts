@@ -13,7 +13,7 @@ fun prop(name: String): String = (project.findProperty(name) as String?)?.trim()
 //   storePassword=...
 //   keyAlias=...
 //   keyPassword=...
-// Without it the release APK is signed with the debug key, which is fine for one family phone.
+// Debug builds can be installed locally without a release keystore.
 val keystoreProps = Properties().apply {
     val f = rootProject.file("keystore.properties")
     if (f.exists()) f.inputStream().use { load(it) }
@@ -24,11 +24,11 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.grandpavoice"
+        applicationId = "com.shadev.shaketoai"
         minSdk = 26
         targetSdk = 36
-        versionCode = 6
-        versionName = "2.0.1"
+        versionCode = 7
+        versionName = "2.0.2"
 
         // Real phones are ARM; dropping x86 halves the APK (WebRTC ships a native library per ABI).
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
@@ -52,7 +52,7 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.findByName("release")
         }
     }
 

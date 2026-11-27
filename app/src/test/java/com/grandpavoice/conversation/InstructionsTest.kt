@@ -19,7 +19,7 @@ class InstructionsTest {
 
     @Test fun selectedLanguageIsUsedInEveryStage() {
         for (language in AppLanguage.entries.filterNot { it == AppLanguage.BULGARIAN }) {
-            val settings = Settings(language = language, systemPrompt = Defaults.SYSTEM_PROMPT_FEMALE)
+            val settings = Settings(language = language, systemPrompt = Defaults.LEGACY_SYSTEM_PROMPT_FEMALE)
             assertTrue(Instructions.build(settings).contains("Always speak in ${language.spokenName}"))
             assertFalse(Instructions.build(settings).contains("Винаги говори на български"))
             assertTrue(Instructions.greeting(settings).contains(language.spokenName))
@@ -31,7 +31,6 @@ class InstructionsTest {
 
     @Test fun womanIsAddressedInFeminine() {
         val text = Instructions.build(Settings(language = AppLanguage.BULGARIAN, userGender = Settings.GENDER_FEMALE, userName = "Мария"))
-        assertTrue(text.contains("възрастна жена"))
         assertTrue(text.contains("женски род"))
         assertTrue(text.contains("уморена ли си"))
         assertTrue(text.contains("Не я прекъсвай"))
@@ -41,13 +40,13 @@ class InstructionsTest {
     }
 
     @Test fun manIsAddressedInMasculine() {
-        val s = Settings(language = AppLanguage.BULGARIAN, userGender = Settings.GENDER_MALE, systemPrompt = Defaults.SYSTEM_PROMPT_FEMALE)
+        val s = Settings(language = AppLanguage.BULGARIAN, userGender = Settings.GENDER_MALE, systemPrompt = Defaults.LEGACY_SYSTEM_PROMPT_FEMALE)
         val text = Instructions.build(s)
-        // An unedited default prompt follows the gender even if the other default is saved.
-        assertTrue(text.contains("възрастен мъж"))
+        assertTrue(text.contains("You are a friendly, patient voice assistant"))
+        assertTrue(text.contains("мъжки род"))
         assertTrue(text.contains("уморен ли си"))
         assertTrue(text.contains("Не го прекъсвай"))
-        assertFalse(text.contains("нейните"))
+        assertFalse(text.contains("за възрастна жена"))
     }
 
     @Test fun editedPromptIsKeptAsWritten() {

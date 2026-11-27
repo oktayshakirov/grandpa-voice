@@ -16,8 +16,8 @@ In Settings, tap **Check connection**. The result should say the connection work
 
 - On a fresh installation, confirm English is preselected. Choose Spanish or German and confirm the setup screens, conversation, and spoken errors match the selection.
 - Change the language in Settings, save, and reopen the app. Verify the choice persists and the next greeting and goodbye use the selected language.
-- Update a device from the signed original APK. Verify it opens in English and retains the account and settings. Choose a different language and verify subsequent upgrades preserve that explicit preference.
-- Check French and Portuguese with the same flow. For spoken errors, install the matching Android text-to-speech voice.
+- Update an existing local build with the same application ID and key. Verify that settings are retained and that an explicit language choice is preserved.
+- Check French, Portuguese, and Bulgarian with the same flow. For spoken errors, install the matching Android text-to-speech voice.
 
 ## 3. Shake sensitivity
 
@@ -71,7 +71,7 @@ Open hidden settings. Under **Shake detection**, the live meter updates as you m
 
 ## Mock server
 
-The mock server exercises the call flow without OpenAI credit. Its scripted audio is Bulgarian, so use a live OpenAI session for multilingual voice checks.
+The mock server exercises the call flow without OpenAI credit. Its scripted audio is English, so use a live OpenAI session for multilingual voice checks.
 
 ```sh
 cd tools/mock-realtime

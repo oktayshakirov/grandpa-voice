@@ -114,8 +114,4 @@
     <string name="test_rate_limited">Твърде много заявки. Опитайте след малко.</string>
     <string name="test_network">Няма връзка с интернет или сървъра.</string>
     <string name="test_error">Грешка от услугата</string>
-    <string name="feedback">Обратна връзка</string>
-    <string name="report_bug">Докладвай проблем</string>
-    <string name="suggest_feature">Предложи подобрение</string>
-    <string name="feedback_unavailable">Отворете GitHub в браузър, за да изпратите обратна връзка.</string>
 </resources>

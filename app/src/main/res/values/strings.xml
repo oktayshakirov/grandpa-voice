@@ -115,8 +115,4 @@
     <string name="test_rate_limited">Too many requests. Try again shortly.</string>
     <string name="test_network">Can’t reach the internet or the server.</string>
     <string name="test_error">Service error</string>
-    <string name="feedback">Feedback</string>
-    <string name="report_bug">Report a bug</string>
-    <string name="suggest_feature">Suggest a feature</string>
-    <string name="feedback_unavailable">Open GitHub in a browser to send feedback.</string>
 </resources>

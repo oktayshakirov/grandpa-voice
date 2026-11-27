@@ -3,17 +3,17 @@ Mock OpenAI Realtime server - test the whole app without an OpenAI account or cr
 
 It plays the part of both the token broker (POST /session) and OpenAI's WebRTC endpoint
 (POST /v1/realtime/calls). The phone does a real WebRTC call to it: microphone audio flows
-up, Bulgarian speech (macOS "Daria" voice) flows back, and the same JSON events OpenAI sends
+up, scripted English speech (macOS "Samantha" voice) flows back, and the same JSON events OpenAI sends
 go over the "oai-events" data channel. So shake detection, audio routing, the conversation
 state machine, ending by "goodbye" and error handling are all exercised for real.
 
-What it cannot test: how well OpenAI understands Bulgarian. For that you need a real key.
+A live session is needed to test voice recognition and multilingual responses.
 
 Scripted conversation (default):
   greeting -> (you speak, or 3 s pass) -> reply -> (you speak, or 3 s pass) -> goodbye + end_conversation
 
 Run:   python3 mock_server.py                (listens on 0.0.0.0:8788)
-App:   Settings -> "Собствен сървър"
+App:   Settings -> "Your own server"
          address: http://10.0.2.2:8788       (emulator; a real phone on Wi-Fi: http://<this computer's IP>:8788,
                                               debug APK only, since release builds require https)
          device token: mock-device-token-for-local-testing
@@ -54,13 +54,13 @@ SPEECH_RMS = 500  # int16 RMS above which incoming audio counts as speech
 
 RATE = 48000
 FRAME = 960  # 20 ms
-AUDIO_DIR = Path(__file__).parent / "audio"
+AUDIO_DIR = Path(__file__).parent / "audio" / "english"
 
 LINES = {
-    "greeting": "Здравей! Радвам се да те чуя. Как си днес?",
-    "reply1": "Много хубаво. Разкажи ми още, слушам те.",
-    "reply2": "Интересно! А какво ще правиш днес?",
-    "goodbye": "Беше ми приятно да си поговорим. Довиждане и до скоро!",
+    "greeting": "Hello! Good to hear you. How are you today?",
+    "reply1": "That's great. Tell me more when you're ready.",
+    "reply2": "Interesting! What are you doing today?",
+    "goodbye": "It was nice talking with you. Goodbye!",
 }
 
 log = logging.getLogger("mock")
@@ -72,14 +72,14 @@ for noisy in ("aioice", "aiortc", "aiohttp.access"):
 # ------------------------------------------------------------------ audio clips
 
 def make_clips() -> dict:
-    AUDIO_DIR.mkdir(exist_ok=True)
+    AUDIO_DIR.mkdir(parents=True, exist_ok=True)
     clips = {}
     for name, text in LINES.items():
         path = AUDIO_DIR / f"{name}.wav"
         if not path.exists():
             if shutil.which("say") and shutil.which("afconvert"):
                 aiff = AUDIO_DIR / f"{name}.aiff"
-                subprocess.run(["say", "-v", "Daria", "-o", str(aiff), text], check=True)
+                subprocess.run(["say", "-v", "Samantha", "-o", str(aiff), text], check=True)
                 subprocess.run(["afconvert", "-f", "WAVE", "-d", f"LEI16@{RATE}", "-c", "1", str(aiff), str(path)], check=True)
                 aiff.unlink()
             else:  # not on a Mac: a short two-tone chime stands in for speech
@@ -262,7 +262,7 @@ class Call:
             instructions = (event.get("response") or {}).get("instructions", "")
             last_line = instructions.strip().splitlines()[-1] if instructions.strip() else ""
             log.info("[%s] phone asked for a response: ...%s", self.id, last_line[-90:])
-            if "Разговорът тъкмо започва" in instructions:
+            if instructions.startswith(("Greet ", "Разговорът тъкмо започва")):
                 self.respond("greeting")
             else:  # a farewell request (inactivity, time limit, or after end_conversation without words)
                 self.respond("goodbye")

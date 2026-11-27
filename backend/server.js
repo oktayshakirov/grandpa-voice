@@ -1,4 +1,4 @@
-// Grandpa Voice – token broker.
+// Shake to AI token broker.
 // Holds the permanent OpenAI API key and hands the phone a short-lived (60 s) Realtime key.
 // Zero dependencies: Node 20+ only. Logs never contain conversation content.
 
@@ -36,11 +36,10 @@ if (DEVICE_TOKENS.length === 0 || DEVICE_TOKENS.some((t) => t.length < 24)) {
   process.exit(1);
 }
 
-const FALLBACK_INSTRUCTIONS = `Ти си приятелски настроен, търпелив и сърдечен събеседник за възрастен човек.
-Говори естествено, топло и спокойно, винаги и само на български език.
-Използвай кратки и лесни за разбиране изречения. Никога не го пришпорвай.
-Ако не разбираш нещо, учтиво помоли човека да повтори.
-Когато човекът иска да приключи разговора, кажи кратко довиждане и извикай функцията end_conversation.`;
+const FALLBACK_INSTRUCTIONS = `You are a friendly, patient voice assistant. Speak in English.
+Use short, clear sentences and give the person time to speak.
+If you miss something, politely ask the person to repeat it.
+When they clearly want to finish, say a short goodbye and then call end_conversation.`;
 
 const END_TOOL = {
   type: "function",
@@ -66,7 +65,7 @@ function turnDetection(mode, allowInterrupt) {
       };
     case "semantic_low":
     default:
-      // "low" = waits longer before deciding he has finished; best for slow speech and pauses.
+      // Low eagerness allows longer pauses before responding.
       return { type: "semantic_vad", eagerness: "low", create_response: true, interrupt_response: interrupt };
   }
 }
